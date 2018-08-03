@@ -35,7 +35,7 @@ set_dimnames <- function(x, value)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### subset_dimnames()
+### subset_dimnames_by_Nindex()
 ###
 
 simplify_NULL_dimnames <- function(dimnames)
@@ -45,25 +45,21 @@ simplify_NULL_dimnames <- function(dimnames)
     dimnames
 }
 
-### Like for extract_array(), 'index' is expected to be an unnamed list of
-### subscripts as positive integer vectors, one vector per dimension in 'x'.
-### *Missing* list elements are allowed and represented by NULLs.
-### See extract_array.R for more information.
-subset_dimnames <- function(dimnames, index)
+subset_dimnames_by_Nindex <- function(dimnames, Nindex)
 {
-    stopifnot(is.list(index))
+    stopifnot(is.list(Nindex))
     if (is.null(dimnames))
         return(NULL)
-    ndim <- length(index)
+    ndim <- length(Nindex)
     stopifnot(is.list(dimnames), length(dimnames) == ndim)
     ## Would mapply() be faster here?
     ans <- lapply(seq_len(ndim),
                   function(along) {
                       dn <- dimnames[[along]]
-                      i <- index[[along]]
+                      i <- Nindex[[along]]
                       if (is.null(dn) || is.null(i))
                           return(dn)
-                      dn[i]
+                      extractROWS(dn, i)
                   })
     simplify_NULL_dimnames(ans)
 }
@@ -108,8 +104,9 @@ extract_Nindex_from_syscall <- function(call, eframe)
 expand_Nindex_RangeNSBS <- function(Nindex)
 {
     stopifnot(is.list(Nindex))
-    RangeNSBS_idx <- which(vapply(Nindex, is, logical(1), "RangeNSBS"))
-    Nindex[RangeNSBS_idx] <- lapply(Nindex[RangeNSBS_idx], as.integer)
+    expand_idx <- which(vapply(Nindex, is, logical(1), "RangeNSBS"))
+    if (length(expand_idx) != 0L)
+        Nindex[expand_idx] <- lapply(Nindex[expand_idx], as.integer)
     Nindex
 }
 

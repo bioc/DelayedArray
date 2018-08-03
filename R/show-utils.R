@@ -6,12 +6,61 @@
 ###
 
 
-### Wrapper around extract_array() that preserves the dimnames.
-.extract_array_with_dimnames <- function(x, index)
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Some wrappers around extract_array_by_Nindex()
+###
+### All of them return a list of 2 ordinary arrays. The dimnames need to
+### propagate so we use extract_array_by_Nindex() instead of extract_array().
+###
+
+.extract_two_1Darrays <- function(x, i1, i2)
 {
-    a <- extract_array(x, index)
-    set_dimnames(a, subset_dimnames(dimnames(x), index))
+    a <- extract_array_by_Nindex(x, list(c(i1, i2)))
+    ii1 <- seq_along(i1)
+    ii2 <- seq_along(i2) + length(i1)
+    x1 <- a[ii1, drop=FALSE]
+    x2 <- a[ii2, drop=FALSE]
+    list(x1, x2)
 }
+
+.extract_two_matrices_by_row <- function(x, i1, i2)
+{
+    a <- extract_array_by_Nindex(x, list(c(i1, i2), NULL))
+    ii1 <- seq_along(i1)
+    ii2 <- seq_along(i2) + length(i1)
+    x1 <- a[ii1, , drop=FALSE]
+    x2 <- a[ii2, , drop=FALSE]
+    list(x1, x2)
+}
+
+.extract_two_matrices_by_col <- function(x, j1, j2)
+{
+    a <- extract_array_by_Nindex(x, list(NULL, c(j1, j2)))
+    jj1 <- seq_along(j1)
+    jj2 <- seq_along(j2) + length(j1)
+    x1 <- a[ , jj1, drop=FALSE]
+    x2 <- a[ , jj2, drop=FALSE]
+    list(x1, x2)
+}
+
+.extract_four_matrices <- function(x, i1, i2, j1, j2)
+{
+    a <- extract_array_by_Nindex(x, list(c(i1, i2), c(j1, j2)))
+    ii1 <- seq_along(i1)
+    ii2 <- seq_along(i2) + length(i1)
+    jj1 <- seq_along(j1)
+    jj2 <- seq_along(j2) + length(j1)
+    x11 <- a[ii1, jj1, drop=FALSE]
+    x21 <- a[ii2, jj1, drop=FALSE]
+    x12 <- a[ii1, jj2, drop=FALSE]
+    x22 <- a[ii2, jj2, drop=FALSE]
+    list(x11, x21, x12, x22)
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Some wrappers around format()
+###
 
 ### 'x' must be an ordinary vector or matrix of atomic or recursive type.
 ### 'max.width' takes effect only if 'x' is character or list (i.e. if the
@@ -51,25 +100,121 @@
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### 1D array
+### Some low-level utilities to handle array names/dimnames
 ###
 
-.split_1Darray_names <- function(x_names, idx1, idx2, justify)
+.wrap_subscripts <- function(i, x_names=NULL, left="[", right="]")
 {
-    make_elt_indices <- function(i) {
-        if (length(i) == 0L)
-            return(character(0))
-        paste0("[", i, "]", sep="")
-    }
-    if (is.null(x_names)) {
-        s1 <- make_elt_indices(idx1)
-        s2 <- make_elt_indices(idx2)
-    } else {
-        s1 <- x_names[idx1]
-        s2 <- x_names[idx2]
-    }
+    if (length(i) == 0L)
+        return(character(0))
+    if (is.null(x_names))
+        return(paste0(left, i, right, sep=""))
+    x_names[i]
+}
+
+.make_1Darray_names <- function(i1, i2, x_names, justify)
+{
+    s1 <- .wrap_subscripts(i1, x_names)
+    s2 <- .wrap_subscripts(i2, x_names)
     format(c(s1, ".", s2), justify=justify)
 }
+
+.make_rownames <- function(i1, i2, x_rownames, justify)
+{
+    s1 <- .wrap_subscripts(i1, x_rownames, right=",]")
+    s2 <- .wrap_subscripts(i2, x_rownames, right=",]")
+    max_width <- max(nchar(s1, type="width"), nchar(s2, type="width"))
+    if (max_width <= 1L) {
+        ellipsis <- "."
+    } else if (max_width == 2L) {
+        ellipsis <- ".."
+    } else {
+        ellipsis <- "..."
+    }
+    format(c(s1, ellipsis, s2), justify=justify)
+}
+
+.make_colnames <- function(j1, j2, x_colnames, justify)
+{
+    s1 <- .wrap_subscripts(j1, x_colnames, left="[,")
+    s2 <- .wrap_subscripts(j2, x_colnames, left="[,")
+    ans <- format(c(s1, s2), justify=justify)
+    c(head(ans, n=length(s1)), "...", tail(ans, n=length(s2)))
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### The extract_and_stitch_* family of helpers
+###
+
+.extract_and_stitch_two_1Darrays <- function(x, i1, i2,
+                                             justify, quote=TRUE)
+{
+    x12 <- .extract_two_1Darrays(x, i1, i2)
+    ans1 <- .format_as_character_vector(x12[[1L]], justify, quote=quote)
+    ans2 <- .format_as_character_vector(x12[[2L]], justify, quote=quote)
+
+    ans <- c(ans1, ".", ans2)
+
+    names(ans) <- .make_1Darray_names(i1, i2, names(x), justify)
+    ans
+}
+
+.extract_and_stitch_two_matrices_by_row <- function(x, i1, i2,
+                                                    justify, quote=TRUE)
+{
+    x12 <- .extract_two_matrices_by_row(x, i1, i2)
+    ans1 <- .format_as_character_matrix(x12[[1L]], justify, quote=quote)
+    ans2 <- .format_as_character_matrix(x12[[2L]], justify, quote=quote)
+
+    hdots <- rep.int(".", ncol(ans1))
+    ans <- rbind(ans1, matrix(hdots, nrow=1L), ans2)
+
+    rownames(ans) <- .make_rownames(i1, i2, rownames(x), justify)
+    ans
+}
+
+.extract_and_stitch_two_matrices_by_col <- function(x, j1, j2,
+                                                    justify, quote=TRUE)
+{
+    x12 <- .extract_two_matrices_by_col(x, j1, j2)
+    ans1 <- .format_as_character_matrix(x12[[1L]], justify, quote=quote)
+    ans2 <- .format_as_character_matrix(x12[[2L]], justify, quote=quote)
+
+    vdots <- rep.int(".", nrow(ans1))
+    ans <- cbind(ans1, matrix(vdots, ncol=1L), ans2)
+
+    colnames(ans) <- .make_colnames(j1, j2, colnames(x), justify)
+    ans
+}
+
+.extract_and_stitch_four_matrices <- function(x, i1, i2, j1, j2,
+                                              justify, quote=TRUE)
+{
+    x1234 <- .extract_four_matrices(x, i1, i2, j1, j2)
+    ans11 <- .format_as_character_matrix(x1234[[1L]], justify, quote=quote)
+    ans21 <- .format_as_character_matrix(x1234[[2L]], justify, quote=quote)
+    ans12 <- .format_as_character_matrix(x1234[[3L]], justify, quote=quote)
+    ans22 <- .format_as_character_matrix(x1234[[4L]], justify, quote=quote)
+
+    hdots <- rep.int(".", ncol(ans11))
+    ans1 <- rbind(ans11, matrix(hdots, nrow=1L), ans21)
+
+    hdots <- rep.int(".", ncol(ans12))
+    ans2 <- rbind(ans12, matrix(hdots, nrow=1L), ans22)
+
+    vdots <- rep.int(".", nrow(ans1))
+    ans <- cbind(ans1, matrix(vdots, ncol=1L), ans2)
+
+    rownames(ans) <- .make_rownames(i1, i2, rownames(x), justify)
+    colnames(ans) <- .make_colnames(j1, j2, colnames(x), justify)
+    ans
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### 1D array
+###
 
 .prepare_1Darray_sample <- function(x, n1, n2, justify, quote=TRUE)
 {
@@ -77,18 +222,13 @@
     x_names <- names(x)
     if (x_len <= n1 + n2 + 1L) {
         ans <- .format_as_character_vector(x, justify, quote=quote)
-        idx1 <- seq_len(x_len)
-        idx2 <- integer(0)
-        names(ans) <- .split_1Darray_names(x_names, idx1, idx2, justify)[idx1]
+        i1 <- seq_len(x_len)
+        i2 <- integer(0)
+        names(ans) <- .make_1Darray_names(i1, i2, x_names, justify)[i1]
     } else {
-        idx1 <- seq_len(n1)
-        idx2 <- seq(to=x_len, by=1L, length.out=n2)
-        x1 <- .extract_array_with_dimnames(x, list(idx1))
-        x2 <- .extract_array_with_dimnames(x, list(idx2))
-        ans1 <- .format_as_character_vector(x1, justify, quote=quote)
-        ans2 <- .format_as_character_vector(x2, justify, quote=quote)
-        ans <- c(ans1, ".", ans2)
-        names(ans) <- .split_1Darray_names(x_names, idx1, idx2, justify)
+        i1 <- seq_len(n1)
+        i2 <- seq(to=x_len, by=1L, length.out=n2)
+        ans <- .extract_and_stitch_two_1Darrays(x, i1, i2, justify, quote=quote)
     }
     ans
 }
@@ -107,101 +247,31 @@
 ### 2D array
 ###
 
-.split_rownames <- function(x_rownames, idx1, idx2, justify)
-{
-    make_row_indices <- function(i) {
-        if (length(i) == 0L)
-            return(character(0))
-        paste0("[", i, ",]", sep="")
-    }
-    if (is.null(x_rownames)) {
-       s1 <- make_row_indices(idx1)
-       s2 <- make_row_indices(idx2)
-    } else {
-       s1 <- x_rownames[idx1]
-       s2 <- x_rownames[idx2]
-    }
-    max_width <- max(nchar(s1, type="width"), nchar(s2, type="width"))
-    if (max_width <= 1L) {
-        ellipsis <- "."
-    } else if (max_width == 2L) {
-        ellipsis <- ".."
-    } else {
-        ellipsis <- "..."
-    }
-    format(c(s1, ellipsis, s2), justify=justify)
-}
-
-.split_colnames <- function(x_colnames, idx1, idx2, justify)
-{
-    make_col_indices <- function(j) {
-        if (length(j) == 0L)
-            return(character(0))
-        paste0("[,", j, "]", sep="")
-    }
-    if (is.null(x_colnames)) {
-        s1 <- make_col_indices(idx1)
-        s2 <- make_col_indices(idx2)
-    } else {
-        s1 <- x_colnames[idx1]
-        s2 <- x_colnames[idx2]
-    }
-    ans <- format(c(s1, s2), justify=justify)
-    c(head(ans, n=length(s1)), "...", tail(ans, n=length(s2)))
-}
-
 .rsplit_2Darray_data <- function(x, m1, m2, justify, quote=TRUE)
 {
     x_nrow <- nrow(x)
-    x_rownames <- rownames(x)
-    idx1 <- seq_len(m1)
-    idx2 <- seq(to=x_nrow, by=1L, length.out=m2)
-
-    x1 <- .extract_array_with_dimnames(x, list(idx1, NULL))
-    x2 <- .extract_array_with_dimnames(x, list(idx2, NULL))
-    ans1 <- .format_as_character_matrix(x1, justify, quote=quote)
-    ans2 <- .format_as_character_matrix(x2, justify, quote=quote)
-    dots <- rep.int(".", ncol(ans1))
-    ans <- rbind(ans1, matrix(dots, nrow=1L), ans2)
-
-    rownames(ans) <- .split_rownames(x_rownames, idx1, idx2, justify)
-    ans
+    i1 <- seq_len(m1)
+    i2 <- seq(to=x_nrow, by=1L, length.out=m2)
+    .extract_and_stitch_two_matrices_by_row(x, i1, i2, justify, quote=quote)
 }
 
 .csplit_2Darray_data <- function(x, n1, n2, justify, quote=TRUE)
 {
     x_ncol <- ncol(x)
-    x_colnames <- colnames(x)
-    idx1 <- seq_len(n1)
-    idx2 <- seq(to=x_ncol, by=1L, length.out=n2)
-
-    x1 <- .extract_array_with_dimnames(x, list(NULL, idx1))
-    x2 <- .extract_array_with_dimnames(x, list(NULL, idx2))
-    ans1 <- .format_as_character_matrix(x1, justify, quote=quote)
-    ans2 <- .format_as_character_matrix(x2, justify, quote=quote)
-    dots <- rep.int(".", nrow(ans1))
-    ans <- cbind(ans1, matrix(dots, ncol=1L), ans2)
-
-    colnames(ans) <- .split_colnames(x_colnames, idx1, idx2, justify)
-    ans
+    j1 <- seq_len(n1)
+    j2 <- seq(to=x_ncol, by=1L, length.out=n2)
+    .extract_and_stitch_two_matrices_by_col(x, j1, j2, justify, quote=quote)
 }
 
 .split_2Darray_data <- function(x, m1, m2, n1, n2, justify, quote=TRUE)
 {
+    x_nrow <- nrow(x)
+    i1 <- seq_len(m1)
+    i2 <- seq(to=x_nrow, by=1L, length.out=m2)
     x_ncol <- ncol(x)
-    x_colnames <- colnames(x)
-    idx1 <- seq_len(n1)
-    idx2 <- seq(to=x_ncol, by=1L, length.out=n2)
-
-    x1 <- .extract_array_with_dimnames(x, list(NULL, idx1))
-    x2 <- .extract_array_with_dimnames(x, list(NULL, idx2))
-    ans1 <- .rsplit_2Darray_data(x1, m1, m2, justify, quote=quote)
-    ans2 <- .rsplit_2Darray_data(x2, m1, m2, justify, quote=quote)
-    dots <- rep.int(".", nrow(ans1))
-    ans <- cbind(ans1, matrix(dots, ncol=1L), ans2)
-
-    colnames(ans) <- .split_colnames(x_colnames, idx1, idx2, justify)
-    ans
+    j1 <- seq_len(n1)
+    j2 <- seq(to=x_ncol, by=1L, length.out=n2)
+    .extract_and_stitch_four_matrices(x, i1, i2, j1, j2, justify, quote=quote)
 }
 
 .prepare_2Darray_sample <- function(x, m1, m2, n1, n2, justify, quote=TRUE)
@@ -233,10 +303,9 @@
             ##   https://stat.ethz.ch/pipermail/r-devel/2016-March/072479.html
             ## TODO: Remove when the bug is fixed.
             if (is.null(colnames(ans))) {
-                idx1 <- seq_len(ncol(ans))
-                idx2 <- integer(0)
-                colnames(ans) <- .split_colnames(NULL, idx1, idx2,
-                                                 justify)[idx1]
+                j1 <- seq_len(ncol(ans))
+                j2 <- integer(0)
+                colnames(ans) <- .make_colnames(j1, j2, NULL, justify)[j1]
             }
         } else {
             ans <- .csplit_2Darray_data(x, n1, n2, justify, quote=quote)
@@ -248,10 +317,9 @@
             ##   https://stat.ethz.ch/pipermail/r-devel/2016-March/072479.html
             ## TODO: Remove when the bug is fixed.
             if (is.null(colnames(ans))) {
-                idx1 <- seq_len(ncol(ans))
-                idx2 <- integer(0)
-                colnames(ans) <- .split_colnames(NULL, idx1, idx2,
-                                                 justify)[idx1]
+                j1 <- seq_len(ncol(ans))
+                j2 <- integer(0)
+                colnames(ans) <- .make_colnames(j1, j2, NULL, justify)[j1]
             }
         } else {
             ans <- .split_2Darray_data(x, m1, m2, n1, n2, justify, quote=quote)
@@ -283,7 +351,9 @@
                                             as.2Dslice=TRUE)
         cat(s, "\n", sep="")
         index <- makeNindexFromArrayViewport(viewport, expand.RangeNSBS=TRUE)
-        slice <- .extract_array_with_dimnames(x, index)
+        ## We use extract_array_by_Nindex() instead of extract_array() to
+        ## propagate the dimnames.
+        slice <- extract_array_by_Nindex(x, index)
         slice <- set_dim(slice, dim(slice)[1:2])
         .print_2Darray_data(slice, m1, m2, n1, n2, quote=quote)
         cat("\n")
@@ -346,7 +416,8 @@
     .print_nDarray_data(x, n1, n2, quote=quote)
 }
 
-.array_one_line_summary <- function(x)
+### NOT exported but used in the HDF5Array package.
+array_as_one_line_summary <- function(x)
 {
     dim_in1string <- paste0(dim(x), collapse=" x ")
     sprintf("<%s> %s object of type \"%s\"", dim_in1string, class(x), type(x))
@@ -356,7 +427,7 @@
 ### that supports dim(), dimnames(), and extract_array().
 show_compact_array <- function(object)
 {
-    cat(.array_one_line_summary(object))
+    cat(array_as_one_line_summary(object))
     if (any(dim(object) == 0L)) {
         cat("\n")
         return()
@@ -370,4 +441,33 @@ show_compact_array <- function(object)
     }
     .print_array_data(object, n1, n2)
 }
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### showAsCell()
+###
+
+### A re-implementation of S4Vectors:::.showAsCell_array() that avoids doing
+### the "reshaping" of the object. Should work on any array-like object that
+### supports extract_array().
+.showAsCell_array_like <- function(object)
+{
+    dim1 <- dim(object)[-1L]
+    p1 <- prod(dim1)
+    if (p1 == 0L)
+        return(rep.int("", nrow(object)))
+    first_cols <- lapply(seq_len(min(p1, 3L)),
+        function(i1) {
+            subscripts <- arrayInd(i1, dim1)
+            index <- c(list(NULL), as.list(subscripts))
+            as.character(extract_array(object, index))
+        }
+    )
+    ans <- do.call(paste, c(first_cols, list(sep=":")))
+    if (p1 > 3L)
+        ans <- paste0(ans, ":...")
+    ans
+}
+
+setMethod("showAsCell", "Array", .showAsCell_array_like)
 
