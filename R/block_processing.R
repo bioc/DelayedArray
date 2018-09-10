@@ -70,6 +70,40 @@ set_verbose_block_processing <- function(verbose)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### get/setDefaultBPPARAM()
+###
+
+getDefaultBPPARAM <- function()
+{
+    getOption("DelayedArray.BPPARAM")
+}
+
+### By default (i.e. when no argument is specified), we set the default
+### BPPARAM to SerialParam() on Windows and to MulticoreParam() on other
+### platforms.
+### The reason we use SerialParam() instead of SnowParam() on Windows is
+### that the latter introduces **a lot** of overhead in the context of block
+### processing. See https://github.com/Bioconductor/BiocParallel/issues/78
+### To the point that disabling parallel evaluation (by using SerialParam())
+### is still much faster than parallel evaluation with SnowParam().
+setDefaultBPPARAM <- function(BPPARAM=NULL)
+{
+    if (is.null(BPPARAM)) {
+        if (.Platform$OS.type == "windows") {
+            BPPARAM <- BiocParallel::SerialParam()
+        } else {
+            BPPARAM <- BiocParallel::MulticoreParam()
+        }
+    } else {
+        if (!is(BPPARAM, "BiocParallelParam"))
+            stop(wmsg("'BPPARAM' must be a BiocParallelParam object"))
+    }
+    options(DelayedArray.BPPARAM=BPPARAM)
+    BPPARAM
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Walking on the blocks
 ###
 ### 3 utility functions to process array-like objects by block.
@@ -136,7 +170,7 @@ block_APPLY <- function(x, APPLY, ..., sink=NULL, max_block_len=NULL)
 ### can be achieved by setting the nb of tasks to the nb of blocks (i.e. with
 ### BPPARAM=MulticoreParam(tasks=length(grid))). However, in practice, that
 ### seems to be slower than using tasks=0 (the default). Investigate this!
-blockApply <- function(x, FUN, ..., grid=NULL, BPREDO=list(), BPPARAM=bpparam())
+blockApply <- function(x, FUN, ..., grid=NULL, BPREDO=list(), BPPARAM=getDefaultBPPARAM())
 {
     FUN <- match.fun(FUN)
     grid <- .normarg_grid(grid, x)

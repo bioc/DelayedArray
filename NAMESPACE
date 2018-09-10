@@ -196,6 +196,7 @@ export(
     supportedRealizationBackends, getRealizationBackend, setRealizationBackend,
 
     ## block_processing.R:
+    getDefaultBPPARAM, setDefaultBPPARAM,
     defaultGrid, blockApply, effectiveGrid, currentBlockId, currentViewport,
     write_array_to_sink,
 

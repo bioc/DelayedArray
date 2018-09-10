@@ -2,6 +2,9 @@
 
 \alias{block_processing}
 
+\alias{getDefaultBPPARAM}
+\alias{setDefaultBPPARAM}
+
 \alias{write_array_to_sink}
 
 \title{Block processing of an array}
