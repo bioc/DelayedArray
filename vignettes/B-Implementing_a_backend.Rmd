@@ -7,7 +7,7 @@ output:
   BiocStyle::html_document
 package: DelayedArray
 vignette: |
-  %\VignetteIndexEntry{Implementing A DelayedArray Backend}
+  %\VignetteIndexEntry{2. Implementing A DelayedArray Backend}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
