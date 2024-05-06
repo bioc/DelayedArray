@@ -1,5 +1,5 @@
 %\VignetteEngine{knitr::knitr}
-%\VignetteIndexEntry{DelayedArray / HDF5Array update}
+%\VignetteIndexEntry{3. A DelayedArray / HDF5Array update (slides from April 2021)}
 %\VignetteDepends{knitr,Matrix,DelayedArray,HDF5Array,lobstr}
 
 % 2019-12-22: A temporary fix to avoid the following pdflatex error caused by
