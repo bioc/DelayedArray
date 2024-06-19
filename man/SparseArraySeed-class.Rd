@@ -37,6 +37,7 @@
 \alias{coerce,SparseArraySeed,dgRMatrix-method}
 \alias{coerce,SparseArraySeed,lgCMatrix-method}
 \alias{coerce,SparseArraySeed,lgRMatrix-method}
+\alias{coerce,SparseArraySeed,COO_SparseArray-method}
 
 \alias{coerce,dgCMatrix,SparseArraySeed-method}
 \alias{coerce,dgRMatrix,SparseArraySeed-method}

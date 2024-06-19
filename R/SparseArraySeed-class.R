@@ -401,6 +401,12 @@ setAs("SparseArraySeed", "lgRMatrix",
     function(from) as(as(from, "RsparseMatrix"), "lgRMatrix")
 )
 
+setAs("SparseArraySeed", "COO_SparseArray",
+    function(from)
+        COO_SparseArray(dim(from), nzcoo=from@nzindex, nzdata=from@nzdata,
+                        dimnames(from), check=FALSE)
+)
+
 .make_SparseArraySeed_from_dgCMatrix_or_lgCMatrix <-
     function(from, use.dimnames=TRUE)
 {
