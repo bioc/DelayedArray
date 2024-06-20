@@ -13,6 +13,7 @@
 \alias{extract_array,DelayedAbind-method}
 
 \alias{is_sparse,DelayedAbind-method}
+\alias{extract_sparse_array,DelayedAbind-method}
 \alias{OLD_extract_sparse_array,DelayedAbind-method}
 
 \alias{updateObject,SeedBinder-method}
@@ -60,7 +61,7 @@
 
 \S4method{is_sparse}{DelayedAbind}(x)
 
-\S4method{OLD_extract_sparse_array}{DelayedAbind}(x, index)
+\S4method{extract_sparse_array}{DelayedAbind}(x, index)
 }
 
 \arguments{
@@ -86,7 +87,8 @@
 
     \item \link[S4Arrays]{extract_array} in the \pkg{S4Arrays} package.
 
-    \item \code{\link{OLD_extract_sparse_array}}.
+    \item \code{\link[SparseArray]{extract_sparse_array}} in the
+          \pkg{SparseArray} package.
   }
 }
 

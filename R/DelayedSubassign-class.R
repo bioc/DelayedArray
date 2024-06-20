@@ -312,6 +312,16 @@ setMethod("is_sparse", "DelayedSubassign",
 )
 
 ### 'is_sparse(x)' is assumed to be TRUE and 'index' is assumed to
+### not contain duplicates. See "extract_sparse_array() contract"
+### in SparseArray/R/extract_sparse_array.R (SparseArray package).
+setMethod("extract_sparse_array", "DelayedSubassign",
+    function(x, index)
+    {
+        stop("NOT IMPLEMENTED YET!")
+    }
+)
+
+### 'is_sparse(x)' is assumed to be TRUE and 'index' is assumed to
 ### not contain duplicates. See "OLD_extract_sparse_array() Terms of Use"
 ### in SparseArraySeed-class.R
 setMethod("OLD_extract_sparse_array", "DelayedSubassign",

@@ -13,6 +13,7 @@
 \alias{extract_array,DelayedSubset-method}
 
 \alias{is_sparse,DelayedSubset-method}
+\alias{extract_sparse_array,DelayedSubset-method}
 \alias{OLD_extract_sparse_array,DelayedSubset-method}
 
 \title{DelayedSubset objects}
@@ -58,7 +59,7 @@
 
 \S4method{is_sparse}{DelayedSubset}(x)
 
-\S4method{OLD_extract_sparse_array}{DelayedSubset}(x, index)
+\S4method{extract_sparse_array}{DelayedSubset}(x, index)
 }
 
 \arguments{
@@ -84,7 +85,8 @@
 
     \item \link[S4Arrays]{extract_array} in the \pkg{S4Arrays} package.
 
-    \item \code{\link{OLD_extract_sparse_array}}.
+    \item \code{\link[SparseArray]{extract_sparse_array}} in the
+          \pkg{SparseArray} package.
   }
 }
 

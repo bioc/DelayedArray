@@ -221,7 +221,7 @@ exportMethods(
     rowsum, arbind, acbind, extract_array, is_sparse, write_block,
 
     ## Methods for generics defined in the SparseArray package:
-    nzdata
+    nzdata, extract_sparse_array
 )
 
 

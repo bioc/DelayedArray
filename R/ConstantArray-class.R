@@ -37,20 +37,31 @@ setMethod("extract_array", "ConstantArraySeed",
         array(x@value, S4Arrays:::get_Nindex_lengths(index, dim(x)))
 )
 
-setMethod("OLD_extract_sparse_array", "ConstantArraySeed",
-    function(x, index)
-    {
-        ans_dim <- S4Arrays:::get_Nindex_lengths(index, dim(x))
-        ans_nzdata <- rep.int(x@value, 0L)
-        SparseArraySeed(ans_dim, nzdata=ans_nzdata, check=FALSE)
-    }
-)
-
 setMethod("is_sparse", "ConstantArraySeed",
     function(x)
     {
         zero <- vector(type(x), length=1L)
         identical(x@value, zero)
+    }
+)
+
+setMethod("extract_sparse_array", "ConstantArraySeed",
+    function(x, index)
+    {
+        stopifnot(is_sparse(x))
+        ans_dim <- S4Arrays:::get_Nindex_lengths(index, dim(x))
+        SparseArray:::new_SVT_SparseArray(ans_dim, type=type(x@value),
+                                          check=FALSE)
+    }
+)
+
+setMethod("OLD_extract_sparse_array", "ConstantArraySeed",
+    function(x, index)
+    {
+        stopifnot(is_sparse(x))
+        ans_dim <- S4Arrays:::get_Nindex_lengths(index, dim(x))
+        ans_nzdata <- rep.int(x@value, 0L)
+        SparseArraySeed(ans_dim, nzdata=ans_nzdata, check=FALSE)
     }
 )
 

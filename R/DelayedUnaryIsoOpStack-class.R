@@ -154,6 +154,37 @@ setMethod("is_sparse", "DelayedUnaryIsoOpStack",
 )
 
 ### 'is_sparse(x)' is assumed to be TRUE and 'index' is assumed to
+### not contain duplicates. See "extract_sparse_array() contract"
+### in SparseArray/R/extract_sparse_array.R (SparseArray package).
+setMethod("extract_sparse_array", "DelayedUnaryIsoOpStack",
+    function(x, index)
+    {
+        svt <- extract_sparse_array(x@seed, index)
+
+        ## FIXME: This won't work if the 'x@OPS' stack is made of the
+        ## operations '+1' and 'log()'. Switch to alternative implementation
+        ## below to address this.
+        for (OP in x@OPS)
+            svt <- OP(svt)
+
+        ## Alternative implementation once the nzvals() getter and setter
+        ## for SVT_SparseArray objects are fully operational. Would this be
+        ## more efficient when many ops are stacked in 'x@OPS'? Oh, it's not
+        ## just about efficiency, it's also about supporting a stack that
+        ## preserves zeros **as a whole** but not necessarily at the level
+        ## of the individual operations. E.g. we want to support a stack made
+        ## of operations '+1' and 'log()'. The current implementation won't
+        ## be able to handle that!!
+        #svt_nzvals <- nzvals(svt)
+        #for (OP in x@OPS)
+        #    svt_nzvals <- OP(svt_nzvals)
+        #nzvals(svt) <- svt_nzvals
+
+        svt
+    }
+)
+
+### 'is_sparse(x)' is assumed to be TRUE and 'index' is assumed to
 ### not contain duplicates. See "OLD_extract_sparse_array() Terms of Use"
 ### in SparseArraySeed-class.R
 setMethod("OLD_extract_sparse_array", "DelayedUnaryIsoOpStack",
@@ -161,9 +192,9 @@ setMethod("OLD_extract_sparse_array", "DelayedUnaryIsoOpStack",
     {
         ## Assuming that the caller respected "OLD_extract_sparse_array()
         ## Terms of Use" (see SparseArraySeed-class.R), 'is_sparse(x)'
-        ## should be TRUE so we can assume that the operations in x@OPS
-        ## preserve the zeros and thus only need to apply them to the
-        ## nonzero data.
+        ## should be TRUE so we can assume that the operations in 'x@OPS'
+        ## preserve the zeros which means that we only need to apply them
+        ## to the nonzero data.
         sas <- OLD_extract_sparse_array(x@seed, index)
         sas_nzdata <- sas@nzdata
         for (OP in x@OPS)
