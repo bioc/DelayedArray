@@ -1,5 +1,5 @@
-- In BioC 3.18: migrate from SparseArraySeed objects to SparseArray objects
-  for handling of sparse data. 7 steps:
+- In BioC 3.18-3.20: migrate from SparseArraySeed objects to SparseArray
+  objects for handling of sparse data. 7 steps:
 
   1. The new location for the extract_sparse_array() generic is in the
      SparseArray package. However SparseArray::extract_sparse_array()
@@ -26,9 +26,13 @@
 
   4. Prepare for the switch from .OLD_read_block() to .NEW_read_block() (see
      S4Arrays/R/read_block.R) by implementing:
+
        (a) SparseArray::extract_sparse_array() methods: one for each
            OLD_extract_sparse_array() method defined in DelayedArray
            and its revdeps;
+           ---
+           THIS STEP WAS COMPLETED ON JULY 1, 2024.
+
        (b) SparseArray::read_block_as_sparse() methods: one for each
            read_sparse_block() method defined in DelayedArray and its revdeps.
 
@@ -40,6 +44,8 @@
      can be deprecated.
 
   7. Finally (in BioC 3.19), SparseArraySeed objects can be deprecated too.
+
+- Add unit tests for DelayedOp subclasses DelayedSubassign and DelayedAbind.
 
 - Backend classes (e.g. HDF5Array) should be defined as:
     setClass("HDF5Array",
