@@ -126,7 +126,7 @@ class(M2@seed)      # a DelayedAperm object
 ## ---------------------------------------------------------------------
 ## DelayedAperm objects always propagate sparsity.
 
-sa0 <- as(a0, "SparseArraySeed")
+sa0 <- SparseArray(a0)
 SA0 <- DelayedArray(sa0)
 showtree(SA0)
 is_sparse(SA0)      # TRUE

@@ -104,17 +104,6 @@ set_grid_context <- function(effective_grid,
         assign(".current_viewport", current_viewport, envir=envir)
 }
 
-.backward_compat <- function(envir, funname)
-{
-    if (!(is.array(envir) || is(envir, "SparseArraySeed")))
-        return(envir)
-    msg <- c("starting with DelayedArray 0.21.1, passing 'block' ",
-             "to ", funname, "() is no longer needed and is ",
-             "considered an error")
-    .Defunct(msg=c("  ", wmsg(msg)))
-    parent.frame(3)
-}
-
 .grid_context_not_found <- c(
     "Grid context not found for the current block. ",
     "Are we in a blockApply(), blockReduce(), gridApply(), ",
@@ -135,7 +124,6 @@ set_grid_context <- function(effective_grid,
 
 effectiveGrid <- function(envir=parent.frame(2))
 {
-    envir <- .backward_compat(envir, "effectiveGrid")
     effective_grid <- try(get(".effective_grid", envir=envir,
                               inherits=FALSE), silent=TRUE)
     if (inherits(effective_grid, "try-error"))
@@ -149,7 +137,6 @@ effectiveGrid <- function(envir=parent.frame(2))
 
 currentBlockId <- function(envir=parent.frame(2))
 {
-    envir <- .backward_compat(envir, "currentBlockId")
     current_block_id <- try(get(".current_block_id", envir=envir,
                                 inherits=FALSE), silent=TRUE)
     if (inherits(current_block_id, "try-error"))
@@ -163,7 +150,6 @@ currentBlockId <- function(envir=parent.frame(2))
 
 currentViewport <- function(envir=parent.frame(2))
 {
-    envir <- .backward_compat(envir, "currentViewport")
     current_viewport <- try(get(".current_viewport", envir=envir,
                                 inherits=FALSE), silent=TRUE)
     if (!inherits(current_viewport, "try-error"))

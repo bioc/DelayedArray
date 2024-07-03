@@ -60,7 +60,7 @@ realize(x, ...)
   A "pristine" \link{DelayedArray} object if \code{BACKEND} is
   not \code{NULL}.
 
-  Otherwise, an ordinary matrix or array, or a \link{SparseArraySeed}
+  Otherwise, an ordinary matrix or array, or a \link[SparseArray]{SparseArray}
   object.
 }
 
@@ -75,6 +75,9 @@ realize(x, ...)
     \item \link{RleArray} objects.
 
     \item \link[HDF5Array]{HDF5Array} objects in the \pkg{HDF5Array} package.
+
+    \item \link[SparseArray]{SparseArray} objects implemented in the
+          \pkg{SparseArray} package.
 
     \item \link[base]{array} objects in base R.
   }
@@ -118,7 +121,7 @@ M3 <- rbind(log(M1), t(M2)) + 0.5
 M3
 
 ## Set the "automatic realization backend" to NULL for in-memory
-## realization (as ordinary array or SparseArraySeed object):
+## realization (as ordinary array or SparseArray object):
 setAutoRealizationBackend(NULL)
 m3 <- realize(M3)  # in-memory realization
 

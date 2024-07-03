@@ -39,10 +39,8 @@ BLOCK_rowSums <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        if (is(block, "SparseArraySeed"))
-            block <- as(block, "CsparseMatrix")  # to dgCMatrix or lgCMatrix
-        ## Dispatch on rowSums() method for matrix, dgCMatrix or lgCMatrix.
-        init + rowSums(block, na.rm=na.rm)
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        init + MatrixGenerics::rowSums(block, na.rm=na.rm)
     }
     FUN_MoreArgs <- list(na.rm=na.rm)
 
@@ -68,10 +66,8 @@ BLOCK_colSums <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        if (is(block, "SparseArraySeed"))
-            block <- as(block, "CsparseMatrix")  # to dgCMatrix or lgCMatrix
-        ## Dispatch on colSums() method for matrix, dgCMatrix or lgCMatrix.
-        init + colSums(block, na.rm=na.rm)
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        init + MatrixGenerics::colSums(block, na.rm=na.rm)
     }
     FUN_MoreArgs <- list(na.rm=na.rm)
 
@@ -116,25 +112,21 @@ setMethod("colSums", "DelayedMatrix", .colSums_DelayedMatrix)
 
 .row_sums_and_nvals <- function(x, na.rm=FALSE)
 {
-    if (is(x, "SparseArraySeed"))
-        x <- as(x, "CsparseMatrix")  # to dgCMatrix or lgCMatrix
-    ## Dispatch on rowSums() method for matrix, dgCMatrix or lgCMatrix.
-    row_sums <- rowSums(x, na.rm=na.rm)
+    ## 'x' is either an ordinary matrix or SVT_SparseMatrix object.
+    row_sums <- MatrixGenerics::rowSums(x, na.rm=na.rm)
     row_nvals <- rep.int(ncol(x), nrow(x))
     if (na.rm)
-        row_nvals <- row_nvals - rowSums(is.na(x))
+        row_nvals <- row_nvals - MatrixGenerics::rowSums(is.na(x))
     data.frame(sum=row_sums, nval=row_nvals)
 }
 
 .col_sums_and_nvals <- function(x, na.rm=FALSE)
 {
-    if (is(x, "SparseArraySeed"))
-        x <- as(x, "CsparseMatrix")  # to dgCMatrix or lgCMatrix
-    ## Dispatch on colSums() method for matrix, dgCMatrix or lgCMatrix.
-    col_sums <- colSums(x, na.rm=na.rm)
+    ## 'x' is either an ordinary matrix or SVT_SparseMatrix object.
+    col_sums <- MatrixGenerics::colSums(x, na.rm=na.rm)
     col_nvals <- rep.int(nrow(x), ncol(x))
     if (na.rm)
-        col_nvals <- col_nvals - colSums(is.na(x))
+        col_nvals <- col_nvals - MatrixGenerics::colSums(is.na(x))
     data.frame(sum=col_sums, nval=col_nvals)
 }
 
@@ -245,18 +237,9 @@ BLOCK_rowMins <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        if (is(block, "SparseArraySeed")) {
-            ## Transposing a SparseArraySeed object is faster than transposing
-            ## a CsparseMatrix derivative so we transpose **before** coercion
-            ## to CsparseMatrix.
-            tblock <- as(t(block), "CsparseMatrix")  # to dgCMatrix or lgCMatrix
-            block_rowmins <-
-                SparseArray:::colMins_dgCMatrix(tblock, na.rm=na.rm)
-        } else {
-            ## Dispatch on matrixStats::rowMins().
-            block_rowmins <- MatrixGenerics::rowMins(block, na.rm=na.rm,
-                                                     useNames=FALSE)
-        }
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        block_rowmins <- MatrixGenerics::rowMins(block, na.rm=na.rm,
+                                                 useNames=FALSE)
         if (is.null(init))
             return(block_rowmins)
         pmin(init, block_rowmins)
@@ -292,14 +275,9 @@ BLOCK_colMins <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        if (is(block, "SparseArraySeed")) {
-            block <- as(block, "CsparseMatrix")  # to dgCMatrix or lgCMatrix
-            block_colmins <- SparseArray:::colMins_dgCMatrix(block, na.rm=na.rm)
-        } else {
-            ## Dispatch on matrixStats::colMins().
-            block_colmins <- MatrixGenerics::colMins(block, na.rm=na.rm,
-                                                     useNames=FALSE)
-        }
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        block_colmins <- MatrixGenerics::colMins(block, na.rm=na.rm,
+                                                 useNames=FALSE)
         if (is.null(init))
             return(block_colmins)
         pmin(init, block_colmins)
@@ -369,18 +347,9 @@ BLOCK_rowMaxs <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        if (is(block, "SparseArraySeed")) {
-            ## Transposing a SparseArraySeed object is faster than transposing
-            ## a CsparseMatrix derivative so we transpose **before** coercion
-            ## to CsparseMatrix.
-            tblock <- as(t(block), "CsparseMatrix")  # to dgCMatrix or lgCMatrix
-            block_rowmaxs <-
-                SparseArray:::colMaxs_dgCMatrix(tblock, na.rm=na.rm)
-        } else {
-            ## Dispatch on matrixStats::rowMaxs().
-            block_rowmaxs <- MatrixGenerics::rowMaxs(block, na.rm=na.rm,
-                                                     useNames=FALSE)
-        }
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        block_rowmaxs <- MatrixGenerics::rowMaxs(block, na.rm=na.rm,
+                                                 useNames=FALSE)
         if (is.null(init))
             return(block_rowmaxs)
         pmax(init, block_rowmaxs)
@@ -416,14 +385,9 @@ BLOCK_colMaxs <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        if (is(block, "SparseArraySeed")) {
-            block <- as(block, "CsparseMatrix")  # to dgCMatrix or lgCMatrix
-            block_colmaxs <- SparseArray:::colMaxs_dgCMatrix(block, na.rm=na.rm)
-        } else {
-            ## Dispatch on matrixStats::colMaxs().
-            block_colmaxs <- MatrixGenerics::colMaxs(block, na.rm=na.rm,
-                                                     useNames=FALSE)
-        }
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        block_colmaxs <- MatrixGenerics::colMaxs(block, na.rm=na.rm,
+                                                 useNames=FALSE)
         if (is.null(init))
             return(block_colmaxs)
         pmax(init, block_colmaxs)
@@ -486,18 +450,9 @@ BLOCK_rowRanges <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        if (is(block, "SparseArraySeed")) {
-            ## Transposing a SparseArraySeed object is faster than transposing
-            ## a CsparseMatrix derivative so we transpose **before** coercion
-            ## to CsparseMatrix.
-            tblock <- as(t(block), "CsparseMatrix")  # to dgCMatrix or lgCMatrix
-            block_rowranges <-
-                SparseArray:::colRanges_dgCMatrix(tblock, na.rm=na.rm)
-        } else {
-            ## Dispatch on matrixStats::rowRanges().
-            block_rowranges <- MatrixGenerics::rowRanges(block, na.rm=na.rm,
-                                                         useNames=FALSE)
-        }
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        block_rowranges <- MatrixGenerics::rowRanges(block, na.rm=na.rm,
+                                                     useNames=FALSE)
         if (is.null(init))
             return(block_rowranges)
         cbind(pmin(init[ , 1L], block_rowranges[ , 1L]),
@@ -534,15 +489,9 @@ BLOCK_colRanges <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        if (is(block, "SparseArraySeed")) {
-            block <- as(block, "CsparseMatrix")  # to dgCMatrix or lgCMatrix
-            block_colranges <-
-                SparseArray:::colRanges_dgCMatrix(block, na.rm=na.rm)
-        } else {
-            ## Dispatch on matrixStats::colRanges().
-            block_colranges <- MatrixGenerics::colRanges(block, na.rm=na.rm,
-                                                         useNames=FALSE)
-        }
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        block_colranges <- MatrixGenerics::colRanges(block, na.rm=na.rm,
+                                                     useNames=FALSE)
         if (is.null(init))
             return(block_colranges)
         cbind(pmin(init[ , 1L], block_colranges[ , 1L]),
@@ -596,8 +545,7 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
 
     blockApply(x,
         function(block, na.rm, center) {
-            if (is(block, "SparseArraySeed"))
-                block <- as(block, "CsparseMatrix")  # to [d|l]gCMatrix
+            ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
             if (is.null(center)) {
                 block_center <- NULL
             } else {
@@ -622,8 +570,7 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
 
     blockApply(x,
         function(block, na.rm, center) {
-            if (is(block, "SparseArraySeed"))
-                block <- as(block, "CsparseMatrix")  # to [d|l]gCMatrix
+            ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
             if (is.null(center)) {
                 block_center <- NULL
             } else {
@@ -675,8 +622,7 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
     FINAL <- function(init, i, grid) { init$sum2 / (init$nval - 1L) }
 
     FUN <- function(init, block, na.rm, center) {
-        if (is(block, "SparseArraySeed"))
-            block <- as(block, "CsparseMatrix")  # to dgCMatrix or lgCMatrix
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
         if (is.null(center)) {
             block_center <- init$center
         } else {
@@ -684,10 +630,13 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
             block_center <- extractROWS(center, viewport_range1)
             block_nvals <- rep.int(ncol(block), nrow(block))
             if (na.rm)
-                block_nvals <- block_nvals - rowSums(is.na(block))
+                block_nvals <- block_nvals -
+                               MatrixGenerics::rowSums(is.na(block))
         }
-        delta <- block - block_center
-        ## Dispatch on rowSums() method for matrix, dgCMatrix or lgCMatrix.
+        delta <- block
+        if (block_center != 0)
+            delta <- as.matrix(delta) - block_center
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
         block_sums2 <- rowSums(delta * delta, na.rm=na.rm)
         if (is.null(center)) {
             init$sum2 <- init$sum2 + block_sums2
@@ -741,8 +690,7 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
     FINAL <- function(init, j, grid) { init$sum2 / (init$nval - 1L) }
 
     FUN <- function(init, block, na.rm, center) {
-        if (is(block, "SparseArraySeed"))
-            block <- as(block, "CsparseMatrix")  # to dgCMatrix or lgCMatrix
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
         if (is.null(center)) {
             block_center <- init$center
         } else {
@@ -750,10 +698,13 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
             block_center <- extractROWS(center, viewport_range2)
             block_nvals <- rep.int(nrow(block), ncol(block))
             if (na.rm)
-                block_nvals <- block_nvals - colSums(is.na(block))
+                block_nvals <- block_nvals -
+                               MatrixGenerics::colSums(is.na(block))
         }
-        delta <- block - rep(block_center, each=nrow(block))
-        ## Dispatch on colSums() method for matrix, dgCMatrix or lgCMatrix.
+        delta <- block
+        if (block_center != 0)
+            delta <- as.matrix(delta) - rep(block_center, each=nrow(block))
+        ## 'delta' is either an ordinary matrix or SVT_SparseMatrix object.
         block_sums2 <- colSums(delta * delta, na.rm=na.rm)
         if (is.null(center)) {
             init$sum2 <- init$sum2 + block_sums2

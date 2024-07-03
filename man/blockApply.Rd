@@ -65,7 +65,7 @@ set_grid_context(effective_grid, current_block_id, current_viewport=NULL,
 
     IMPORTANT: If \code{as.sparse} is set to \code{FALSE}, all blocks will
     be passed to \code{FUN} as ordinary arrays. If it's set to \code{TRUE},
-    they will be passed as \link{SparseArraySeed} objects.
+    they will be passed as \link[SparseArray]{SparseArray} objects.
     If it's set to \code{NA}, then \code{is_sparse(x)} determines how they
     will be passed to \code{FUN}.
 
@@ -196,6 +196,9 @@ set_grid_context(effective_grid, current_block_id, current_viewport=NULL,
 
     \item \code{\link[S4Arrays]{read_block}} and
           \code{\link[S4Arrays]{write_block}} in the \pkg{S4Arrays} package.
+
+    \item \link[SparseArray]{SparseArray} objects implemented in the
+          \pkg{SparseArray} package.
 
     \item \code{\link[BiocParallel]{MulticoreParam}},
           \code{\link[BiocParallel]{SnowParam}}, and

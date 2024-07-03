@@ -2,6 +2,7 @@
 ### SparseArraySeed objects
 ### -------------------------------------------------------------------------
 
+### Everything in this file is deprecated in BioC >= 3.20!
 
 setClass("SparseArraySeed",
     contains="Array",
@@ -109,12 +110,13 @@ setReplaceMethod("dimnames", "SparseArraySeed",
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### sparsity()
 ###
+### Now defined in the SparseArray package!
 
-setGeneric("sparsity", function(x) standardGeneric("sparsity"))
+#setGeneric("sparsity", function(x) standardGeneric("sparsity"))
 
-setMethod("sparsity", "SparseArraySeed",
-    function(x) { 1 - length(nzdata(x)) / length(x) }
-)
+#setMethod("sparsity", "SparseArraySeed",
+#    function(x) { 1 - length(nzdata(x)) / length(x) }
+#)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -143,6 +145,8 @@ setMethod("sparsity", "SparseArraySeed",
 SparseArraySeed <- function(dim, nzindex=NULL, nzdata=NULL, dimnames=NULL,
                             check=TRUE)
 {
+    msg <- "SparseArraySeed objects are deprecated in BioC >= 3.20"
+    .Deprecated(msg=wmsg(msg))
     if (!is.numeric(dim))
         stop(wmsg("'dim' must be an integer vector"))
     if (!is.integer(dim))
@@ -188,6 +192,8 @@ SparseArraySeed <- function(dim, nzindex=NULL, nzdata=NULL, dimnames=NULL,
 ### Return a SparseArraySeed object.
 dense2sparse <- function(x)
 {
+    msg <- "dense2sparse() is deprecated in BioC >= 3.20"
+    .Deprecated(msg=wmsg(msg))
     x_dim <- dim(x)
     if (is.null(x_dim))
         stop(wmsg("'x' must be an array-like object"))
@@ -205,6 +211,8 @@ sparse2dense <- function(sas)
 {
     if (!is(sas, "SparseArraySeed"))
         stop(wmsg("'sas' must be a SparseArraySeed object"))
+    msg <- "SparseArraySeed objects are deprecated in BioC >= 3.20"
+    .Deprecated(msg=wmsg(msg))
     sas_nzdata <- nzdata(sas)
     zero <- vector(typeof(sas_nzdata), length=1L)
     ans <- array(zero, dim=dim(sas))
@@ -234,6 +242,9 @@ sparse2dense <- function(sas)
 setGeneric("OLD_extract_sparse_array",
     function(x, index)
     {
+        msg <- c("OLD_extract_sparse_array() is deprecated in BioC >= 3.20. ",
+                 "Please use SparseArray::extract_sparse_array() instead.")
+        .Deprecated(msg=wmsg(msg))
         x_dim <- dim(x)
         if (is.null(x_dim))
             stop(wmsg("first argument to OLD_extract_sparse_array() ",

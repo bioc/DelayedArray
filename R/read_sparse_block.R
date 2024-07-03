@@ -13,6 +13,9 @@
 setGeneric("read_sparse_block", signature="x",
     function(x, viewport)
     {
+        msg <- c("read_sparse_block() is deprecated in BioC >= 3.20. ",
+                 "Please use SparseArray::read_block_as_sparse() instead.")
+        .Deprecated(msg=wmsg(msg))
         stopifnot(is(viewport, "ArrayViewport"),
                   identical(refdim(viewport), dim(x)))
         ans <- standardGeneric("read_sparse_block")

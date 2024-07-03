@@ -422,7 +422,7 @@ setMethod("gsub", c(x="DelayedArray"),
 .BLOCK_anyNA <- function(x, recursive=FALSE, grid=NULL, as.sparse=NA)
 {
     FUN <- function(block, init) {
-        ## Dispatch on anyNA() method for array or SparseArraySeed.
+        ## 'block' is either an ordinary array or SVT_SparseArray object.
         anyNA(block) || init
     }
     init <- FALSE
@@ -571,13 +571,13 @@ setMethod("table", "DelayedArray", .table_DelayedArray)
         ##   - if 'init' is NULL: we use tryCatch() to catch the warning
         ##   - otherwise: we just suppress (and ignore) the warning
         if (is.null(init)) {
-            ## Dispatch on "Summary" group method for array or SparseArraySeed.
+            ## 'block' is either an ordinary array or SVT_SparseArray object.
             reduced_block <- tryCatch(GENERIC(block, na.rm=na.rm),
                                       warning=identity)
             if (is(reduced_block, "warning"))
                 return(NULL)
         } else {
-            ## Dispatch on "Summary" group method for array or SparseArraySeed.
+            ## 'block' is either an ordinary array or SVT_SparseArray object.
             reduced_block <- suppressWarnings(GENERIC(block, na.rm=na.rm))
         }
         GENERIC(reduced_block, init)
@@ -636,13 +636,13 @@ setMethod("Summary", "DelayedArray", .Summary_DelayedArray)
         ## is TRUE and 'block' contains only NA's or NaN's.
         ## We handle this warning like in .BLOCK_Summary() above.
         if (is.null(init)) {
-            ## Dispatch on range() method for array or SparseArraySeed.
+            ## 'block' is either an ordinary array or SVT_SparseArray object.
             reduced_block <- tryCatch(range(block, na.rm=na.rm, finite=finite),
                                       warning=identity)
             if (is(reduced_block, "warning"))
                 return(NULL)
         } else {
-            ## Dispatch on range() method for array or SparseArraySeed.
+            ## 'block' is either an ordinary array or SVT_SparseArray object.
             reduced_block <- suppressWarnings(range(block, na.rm=na.rm,
                                                            finite=finite))
         }
@@ -696,11 +696,10 @@ setMethod("range", "DelayedArray",
                   "does not support the 'trim' argument yet"))
 
     FUN <- function(block, init) {
-        ## Dispatch on sum() method for array or SparseArraySeed.
+        ## 'block' is either an ordinary array or SVT_SparseArray object.
         block_sum <- sum(block, na.rm=na.rm)
         block_nval <- length(block)
         if (na.rm)
-            ## Dispatch on is.na() method for array or SparseArraySeed.
             block_nval <- block_nval - sum(is.na(block))
         c(block_sum, block_nval) + init
     }

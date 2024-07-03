@@ -30,6 +30,8 @@
 \title{Operate natively on SparseArraySeed objects}
 
 \description{
+   WARNING: SparseArraySeed objects are deprecated in BioC >= 3.20!
+
    Some utilities to operate natively on \link{SparseArraySeed} objects.
    Mostly for internal use by the \pkg{DelayedArray} package e.g. they
    support block processed methods for sparse \link{DelayedArray} objects
@@ -119,19 +121,6 @@
 }
 
 \examples{
-## Create a SparseArraySeed object:
-dim1 <- 5:3
-nzindex1 <- Lindex2Mindex(sample(60, 14), 5:3)
-sas1 <- SparseArraySeed(dim1, nzindex1, nzdata=sample(0:13))
-
-## Apply native operations:
-sum(sas1)
-range(sas1)
-mean(sas1)
-
-## Sanity checks:
-stopifnot(identical(sum(as.array(sas1)), sum(sas1)))
-stopifnot(identical(range(as.array(sas1)), range(sas1)))
-stopifnot(identical(mean(as.array(sas1)), mean(sas1)))
+## WARNING: SparseArraySeed objects are deprecated in BioC >= 3.20!
 }
 \keyword{methods}

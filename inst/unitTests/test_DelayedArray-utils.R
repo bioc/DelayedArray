@@ -5,48 +5,47 @@ ARITH_OPS   <- c("+", "-", "*", "/", "^", "%%", "%/%")
 COMPARE_OPS <- c("==", "!=", "<=", ">=", "<", ">")
 LOGIC_OPS   <- c("&", "|")  # currently untested
 
-### Toy integer 3D SparseArraySeed.
-.make_toy_sas1 <- function()
+### Toy integer 3D SVT_SparseArray.
+.make_toy_svt1 <- function()
 {
     dim1 <- c(5L, 10L, 3L)
-    nzindex1 <- Lindex2Mindex(1:prod(dim1), dim1)
+    svt1 <- poissonSparseArray(dim1, lambda=0)
+    nzvals1 <- 24:-9
+    nzvals1[2:3] <- NA
+    nzvals1[4:5] <- 0L
     set.seed(123)
-    nzindex1 <- nzindex1[sample(nrow(nzindex1), 30), , drop=FALSE]
-    nzdata1 <- 24:-5
-    nzdata1[2:3] <- NA
-    nzdata1[4:5] <- 0L
-    SparseArraySeed(dim1, nzindex1, nzdata1)
+    svt1[sample(length(svt1), length(nzvals1))] <- nzvals1
+    svt1
 }
 
-### Toy integer 3D SparseArraySeed with no zeros or NAs.
-.make_toy_sas1b <- function()
+### Toy integer 3D array with no zeros or NAs.
+.make_toy_a1b <- function()
 {
     dim1b <- c(5L, 10L, 3L)
-    nzindex1b <- Lindex2Mindex(1:prod(dim1b), dim1b)
     set.seed(123)
-    nzindex1b <- nzindex1b[sample(nrow(nzindex1b)), , drop=FALSE]
-    nzdata1b <- sample(10L, nrow(nzindex1b), replace=TRUE)
-    SparseArraySeed(dim1b, nzindex1b, nzdata1b)
+    array(sample(10L, prod(dim1b), replace=TRUE), dim1b)
 }
 
 ### Toy numeric 3D array with one NA and plenty of zeros, Inf's, -Inf's,
 ### and NaN's.
 .make_toy_a2 <- function()
 {
-    a1b <- as.array(.make_toy_sas1b())
+    a1b <- .make_toy_a1b()
     a2 <- 2:-2 / (a1b - 5)
     a2[2, 9, 2] <- NA  # same as a2[[92]] <- NA
     a2
 }
 
-### Toy character 3D SparseArraySeed.
-.make_toy_sas3 <- function()
+### Toy character 3D SVT_SparseArray.
+.make_toy_svt3 <- function()
 {
-    sas1 <- .make_toy_sas1()
-    nzdata3 <- paste0(sas1@nzdata, "aXb")
-    nzdata3[2:3] <- NA
-    nzdata3[4:5] <- ""
-    SparseArraySeed(dim(sas1), sas1@nzindex, nzdata3)
+    svt3 <- .make_toy_svt1()
+    nzvals3 <- nzvals(svt3)
+    nzvals3 <- paste0(nzvals3, "aXb")
+    nzvals3[2:3] <- NA
+    nzvals3[4:5] <- ""
+    nzvals(svt3) <- nzvals3
+    svt3
 }
 
 .BLOCK_SIZES1 <- c(12L, 20L, 50L, 15000L)
@@ -62,7 +61,7 @@ test_DelayedArray_unary_iso_ops <- function()
         checkIdentical(GENERIC(a), as.array(current))
     }
 
-    a1 <- as.array(.make_toy_sas1())  # integer 3D array
+    a1 <- as.array(.make_toy_svt1())  # integer 3D array
     A1 <- DelayedArray(realize(a1))
     a2 <- .make_toy_a2()  # numeric 3D array
     A2 <- DelayedArray(realize(a2))
@@ -71,7 +70,7 @@ test_DelayedArray_unary_iso_ops <- function()
         do_tests(.Generic, a2, A2)
     }
 
-    a3 <- as.array(.make_toy_sas3())  # character 3D array
+    a3 <- as.array(.make_toy_svt3())  # character 3D array
     A3 <- DelayedArray(realize(a3))
     for (.Generic in c("nchar", "tolower", "toupper")) {
         do_tests(.Generic, a3, A3)
@@ -108,7 +107,7 @@ test_DelayedArray_Math_ans_Arith <- function()
         checkIdentical(toto1(target2), as.array(current))
     }
 
-    a1 <- as.array(.make_toy_sas1())  # integer 3D array
+    a1 <- as.array(.make_toy_svt1())  # integer 3D array
     A1 <- DelayedArray(realize(a1))
     a2 <- .make_toy_a2()  # numeric 3D array
     A2 <- DelayedArray(realize(a2))
@@ -172,7 +171,7 @@ test_DelayedArray_Ops_with_left_or_right_vector <- function()
     for (.Generic in c(ARITH_OPS, COMPARE_OPS))
         do_tests(.Generic, a2, A2, m, M)
 
-    a1 <- as.array(.make_toy_sas1())  # integer 3D array
+    a1 <- as.array(.make_toy_svt1())  # integer 3D array
     a <- a1 >= 1L  # logical 3D array
     A <- DelayedArray(realize(a))
     m <- a[ , , 2]
@@ -183,7 +182,7 @@ test_DelayedArray_Ops_with_left_or_right_vector <- function()
 
 test_DelayedArray_Ops_with_conformable_args <- function()
 {
-    a1 <- as.array(.make_toy_sas1())  # integer 3D array
+    a1 <- as.array(.make_toy_svt1())  # integer 3D array
     A1 <- DelayedArray(realize(a1))
     a2 <- .make_toy_a2()  # numeric 3D array
     A2 <- DelayedArray(realize(a2))
@@ -287,9 +286,9 @@ test_DelayedArray_anyNA <- function()
     on.exit(suppressMessages(setAutoBlockSize()))
     BLOCK_anyNA <- DelayedArray:::.BLOCK_anyNA
 
-    a1 <- as.array(.make_toy_sas1())   # integer 3D array
+    a1 <- as.array(.make_toy_svt1())   # integer 3D array
     A1 <- DelayedArray(realize(a1))
-    a1b <- as.array(.make_toy_sas1b()) # integer 3D array with no zeros or NAs
+    a1b <- .make_toy_a1b()  # integer 3D array with no zeros or NAs
     A1b <- DelayedArray(realize(a1b))
 
     for (block_size in .BLOCK_SIZES1) {
@@ -306,7 +305,7 @@ test_DelayedArray_which <- function()
     on.exit(suppressMessages(setAutoBlockSize()))
     BLOCK_which <- DelayedArray:::BLOCK_which
 
-    a1 <- as.array(.make_toy_sas1())  # integer 3D array
+    a1 <- as.array(.make_toy_svt1())  # integer 3D array
     a <- a1 >= 1L  # logical 3D array
     A <- DelayedArray(realize(a))
     target1 <- which(a)
@@ -351,8 +350,8 @@ test_DelayedArray_Summary <- function()
         }
     }
 
-    a1 <- as.array(.make_toy_sas1())   # integer 3D array
-    a1b <- as.array(.make_toy_sas1b()) # integer 3D array with no zeros or NAs
+    a1 <- as.array(.make_toy_svt1())   # integer 3D array
+    a1b <- .make_toy_a1b()  # integer 3D array with no zeros or NAs
     a2 <- .make_toy_a2()  # numeric 3D array
     for (.Generic in c("max", "min", "range")) {
         do_tests(.Generic, a1, .BLOCK_SIZES1, checkIdentical)
@@ -397,8 +396,8 @@ test_DelayedArray_mean <- function()
         }
     }
 
-    a1 <- as.array(.make_toy_sas1())   # integer 3D array
-    a1b <- as.array(.make_toy_sas1b()) # integer 3D array with no zeros or NAs
+    a1 <- as.array(.make_toy_svt1())   # integer 3D array
+    a1b <- .make_toy_a1b()  # integer 3D array with no zeros or NAs
     a2 <- .make_toy_a2()  # numeric 3D array
     do_tests(a1, .BLOCK_SIZES1)
     do_tests(a1b, .BLOCK_SIZES1)
@@ -431,7 +430,7 @@ test_DelayedArray_apply <- function()
         }
     }
 
-    a1b <- as.array(.make_toy_sas1b()) # integer 3D array with no zeros or NAs
+    a1b <- .make_toy_a1b()  # integer 3D array with no zeros or NAs
     do_tests(a1b)
     do_tests(a1b[ , , 0])
 

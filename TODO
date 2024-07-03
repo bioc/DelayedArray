@@ -39,11 +39,17 @@
   5. Switch from .OLD_read_block() to .NEW_read_block() in S4Arrays.
      Also coerce to SparseArray instead of SparseArraySeed in the default
      realize() method (and update man page).
+     ---
+     THIS STEP WAS COMPLETED ON JULY 2, 2024.
 
-  6. Then, all the OLD_extract_sparse_array() and read_sparse_block() methods
+  6. Then, the OLD_extract_sparse_array() and read_sparse_block() generics
      can be deprecated.
+     ---
+     THIS STEP WAS COMPLETED ON JULY 2, 2024.
 
-  7. Finally (in BioC 3.19), SparseArraySeed objects can be deprecated too.
+  7. Finally (in BioC 3.20), SparseArraySeed objects can be deprecated too.
+     ---
+     THIS STEP WAS COMPLETED ON JULY 2, 2024.
 
 - Add unit tests for DelayedOp subclasses DelayedSubassign and DelayedAbind.
 

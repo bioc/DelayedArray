@@ -22,7 +22,7 @@ BLOCK_which <- function(x, arr.ind=FALSE, grid=NULL, as.sparse=NA)
         stop("'arr.ind' must be TRUE or FALSE")
     FUN <- function(block, arr.ind) {
         bid <- currentBlockId()
-        ## Dispatch on which() method for array or SparseArraySeed.
+        ## 'block' is either an ordinary array or SVT_SparseArray object.
         minor <- which(block)
         major <- rep.int(bid, length(minor))
         grid <- effectiveGrid()
@@ -98,9 +98,6 @@ BLOCK_which <- function(x, arr.ind=FALSE, grid=NULL, as.sparse=NA)
                 Mindex1 <- mapToRef(bid, minor, grid, linear=TRUE)
                 block_ans <- .extract_array_element(x, Mindex1)
             } else {
-                ## TODO: Use read_block( , as.sparse=NA) here once subsetting
-                ## a SparseArraySeed object by a linear index (L-index) is
-                ## supported.
                 block <- read_block(x, grid[[bid]])
                 block_ans <- block[minor]
             }
@@ -303,6 +300,9 @@ setMethod("[", "DelayedArray", .subset_DelayedArray)
 ### efficient (2x faster in average).
 .BLOCK_dense2sparse <- function(x, grid=NULL)
 {
+    msg <- c("coercion from DelayedArray to SparseArraySeed ",
+             "is deprecated in BioC >= 3.20")
+    .Deprecated(msg=wmsg(msg))
     FUN <- function(block, arr.ind) {
         bid <- currentBlockId()
         minor <- base::which(block != 0L)

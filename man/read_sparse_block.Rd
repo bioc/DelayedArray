@@ -8,6 +8,8 @@
 
 \description{
   An internal generic not meant to be called directly by the end user.
+
+  Deprecated in BioC >= 3.20.
 }
 
 \keyword{internal}

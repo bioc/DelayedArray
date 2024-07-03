@@ -421,8 +421,7 @@ BLOCK_rowsum <- function(x, group, reorder=TRUE, na.rm=FALSE,
     ## --- define FUN() ---
 
     FUN <- function(init, block, group, ugroup, na.rm=FALSE) {
-        if (is(block, "SparseArraySeed"))
-            block <- as(block, "CsparseMatrix")  # to dgCMatrix or lgCMatrix
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
         vp <- currentViewport()
         group2 <- extractROWS(group, ranges(vp)[1L])
         block_ans <- rowsum(block, group2, reorder=FALSE, na.rm=na.rm)
@@ -529,8 +528,7 @@ BLOCK_colsum <- function(x, group, reorder=TRUE, na.rm=FALSE,
     ## --- define FUN() ---
 
     FUN <- function(init, block, group, ugroup, na.rm=FALSE) {
-        if (is(block, "SparseArraySeed"))
-            block <- as(block, "CsparseMatrix")  # to dgCMatrix or lgCMatrix
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
         vp <- currentViewport()
         group2 <- extractROWS(group, ranges(vp)[2L])
         block_ans <- colsum(block, group2, reorder=FALSE, na.rm=na.rm)

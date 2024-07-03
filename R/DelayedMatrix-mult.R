@@ -122,8 +122,7 @@
     ## --- define FUN() ---
 
     FUN <- function(init, block, y, BLOCK_OP) {
-        if (is(block, "SparseArraySeed"))
-            block <- as(block, "CsparseMatrix")  # to dgCMatrix or lgCMatrix
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
         vp <- currentViewport()
         block_ans <- BLOCK_OP(block, y, ranges(vp))
         if (!is.matrix(block_ans))
@@ -219,8 +218,7 @@
     ## --- define FUN() ---
 
     FUN <- function(init, block, x, BLOCK_OP) {
-        if (is(block, "SparseArraySeed"))
-            block <- as(block, "CsparseMatrix")  # to dgCMatrix or lgCMatrix
+        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
         vp <- currentViewport()
         block_ans <- BLOCK_OP(x, block, ranges(vp))
         if (!is.matrix(block_ans))
@@ -508,16 +506,6 @@ setMethod("tcrossprod", c("ANY", "DelayedMatrix"),
 ### This also requires care to respect the maximum block size.
 ###
 
-### A thin wrapper around read_block().
-### TODO: Get rid of this when we switch from SparseArraySeed to
-### SVT_SparseArray (then callers should just call read_block() directly).
-.read_matrix_block <- function(...) {
-    block <- read_block(..., as.sparse=NA)
-    if (is(block, "SparseArraySeed"))
-        block <- as(block, "CsparseMatrix")  # to dgCMatrix or lgCMatrix
-    block
-}
-
 .grid_by_dimension <- function(x, nworkers)
 # Splits a dimension of the matrix into at least 'nworkers' blocks.
 # If the block size is too large, it is reduced to obtain the desired
@@ -544,12 +532,12 @@ setMethod("tcrossprod", c("ANY", "DelayedMatrix"),
 
 .left_mult <- function(bid, grid, x, y, MULT) {
     # this, and all other calls, had better yield a non-DA, otherwise MULT will recurse endlessly.
-    block <- .read_matrix_block(x, grid[[bid]])
+    block <- read_block(x, grid[[bid]])
     MULT(block, y)
 }
 
 .right_mult <- function(bid, grid, x, y, MULT) {
-    block <- .read_matrix_block(y, grid[[bid]])
+    block <- read_block(y, grid[[bid]])
     MULT(x, block)
 }
 

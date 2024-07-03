@@ -260,8 +260,6 @@ registeredRealizationBackends()
     \item \code{\link{defaultSinkAutoGrid}} to create an automatic grid
           on a RealizationSink derivative.
 
-    \item \link{SparseArraySeed} objects.
-
     \item \code{\link{blockApply}} and family for convenient block
           processing of an array-like object.
 

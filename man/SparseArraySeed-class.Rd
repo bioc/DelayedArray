@@ -11,8 +11,6 @@
 \alias{nzdata,SparseArraySeed-method}
 \alias{dimnames,SparseArraySeed-method}
 \alias{dimnames<-,SparseArraySeed,ANY-method}
-\alias{sparsity}
-\alias{sparsity,SparseArraySeed-method}
 
 \alias{dense2sparse}
 \alias{sparse2dense}
@@ -55,8 +53,13 @@
 \title{SparseArraySeed objects}
 
 \description{
-  SparseArraySeed objects are used internally to support block processing
-  of array-like objects.
+  WARNING: SparseArraySeed objects are deprecated in BioC >= 3.20!
+
+  SparseArraySeed objects were used internally to support block processing
+  of sparse array-like objects in Bioconductor < 3.20.
+  In Bioconductor 3.20, they were replaced with
+  \link[SparseArray]{SparseArray} objects from the \pkg{SparseArray}
+  package.
 }
 
 \usage{
@@ -66,7 +69,6 @@ SparseArraySeed(dim, nzindex=NULL, nzdata=NULL, dimnames=NULL, check=TRUE)
 ## Getters (in addition to dim(), length(), and dimnames()):
 nzindex(x)
 nzdata(x)
-sparsity(x)
 
 ## Two low-level utilities:
 dense2sparse(x)
@@ -98,8 +100,8 @@ sparse2dense(sas)
     Should the object be validated upon construction?
   }
   \item{x}{
-    A SparseArraySeed object for the \code{nzindex}, \code{nzdata}, and
-    \code{sparsity} getters.
+    A SparseArraySeed object for the \code{nzindex} and \code{nzdata}
+    getters.
 
     An array-like object for \code{dense2sparse}.
   }
@@ -116,10 +118,6 @@ sparse2dense(sas)
           nonzero data.
 
     \item For \code{nzdata()}: The vector of nonzero data.
-
-    \item For \code{sparsity()}: The number of zero-valued elements
-          in the implicit array divided by the total number of array
-          elements (a.k.a. the length of the array).
 
     \item For \code{dense2sparse()}: A SparseArraySeed instance.
 
@@ -153,111 +151,7 @@ sparse2dense(sas)
 }
 
 \examples{
-## ---------------------------------------------------------------------
-## EXAMPLE 1
-## ---------------------------------------------------------------------
-dim1 <- 5:3
-nzindex1 <- Lindex2Mindex(sample(60, 8), 5:3)
-nzdata1 <- 11.11 * seq_len(nrow(nzindex1))
-sas1 <- SparseArraySeed(dim1, nzindex1, nzdata1)
-
-dim(sas1)        # the dimensions of the implicit array
-length(sas1)     # the length of the implicit array
-nzindex(sas1)
-nzdata(sas1)
-type(sas1)
-sparsity(sas1)
-
-sparse2dense(sas1)
-as.array(sas1)   # same as sparse2dense(sas1)
-
-\dontrun{
-as.matrix(sas1)  # error!
-}
-## ---------------------------------------------------------------------
-## EXAMPLE 2
-## ---------------------------------------------------------------------
-m2 <- matrix(c(5:-2, rep.int(c(0L, 99L), 11)), ncol=6)
-sas2 <- dense2sparse(m2)
-class(sas2)
-dim(sas2)
-length(sas2)
-nzindex(sas2)
-nzdata(sas2)
-type(sas2)
-sparsity(sas2)
-
-stopifnot(identical(sparse2dense(sas2), m2))
-
-as.matrix(sas2)  # same as sparse2dense(sas2)
-
-t(sas2)
-stopifnot(identical(as.matrix(t(sas2)), t(as.matrix(sas2))))
-
-## ---------------------------------------------------------------------
-## COERCION FROM/TO dg[C|R]Matrix OR lg[C|R]Matrix OBJECTS
-## ---------------------------------------------------------------------
-## dg[C|R]Matrix and lg[C|R]Matrix objects are defined in the Matrix
-## package.
-
-## dgCMatrix/dgRMatrix:
-
-M2C <- as(sas2, "dgCMatrix")
-stopifnot(identical(M2C, as(m2, "dgCMatrix")))
-
-sas2C <- as(M2C, "SparseArraySeed")
-## 'sas2C' is the same as 'sas2' except that 'nzdata(sas2C)' has
-## type "double" instead of "integer":
-stopifnot(all.equal(sas2, sas2C))
-typeof(nzdata(sas2C))  # double
-typeof(nzdata(sas2))   # integer
-
-M2R <- as(sas2, "dgRMatrix")
-stopifnot(identical(M2R, as(m2, "dgRMatrix")))
-sas2R <- as(M2R, "SparseArraySeed")
-stopifnot(all.equal(as.matrix(sas2), as.matrix(sas2R)))
-
-## lgCMatrix/lgRMatrix:
-
-m3 <- m2 == 99  # logical matrix
-sas3 <- dense2sparse(m3)
-class(sas3)
-type(sas3)
-
-M3C <- as(sas3, "lgCMatrix")
-stopifnot(identical(M3C, as(m3, "lgCMatrix")))
-sas3C <- as(M3C, "SparseArraySeed")
-identical(as.matrix(sas3), as.matrix(sas3C))
-
-M3R <- as(sas3, "lgRMatrix")
-#stopifnot(identical(M3R, as(m3, "lgRMatrix")))
-sas3R <- as(M3R, "SparseArraySeed")
-identical(as.matrix(sas3), as.matrix(sas3R))
-
-## ---------------------------------------------------------------------
-## SEED CONTRACT
-## ---------------------------------------------------------------------
-## SparseArraySeed objects comply with the "seed contract".
-## In particular they support extract_array():
-extract_array(sas1, list(c(5, 3:2, 5), NULL, 3))
-
-## See '?extract_array' in the S4Arrays package for more information
-## about the "seed contract".
-
-## This means that they can be wrapped in a DelayedArray object:
-A1 <- DelayedArray(sas1)
-A1
-
-## A big very sparse DelayedMatrix object:
-nzindex4 <- cbind(sample(25000, 600000, replace=TRUE),
-                  sample(195000, 600000, replace=TRUE))
-nzdata4 <- runif(600000)
-sas4 <- SparseArraySeed(c(25000, 195000), nzindex4, nzdata4)
-sparsity(sas4)
-
-M4 <- DelayedArray(sas4)
-M4
-colSums(M4[ , 1:20])
+## WARNING: SparseArraySeed objects are deprecated in BioC >= 3.20!
 }
 \keyword{classes}
 \keyword{methods}

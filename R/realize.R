@@ -76,7 +76,7 @@ setMethod("realize", "ANY",
             return(as(x, BACKEND))
         }
         if (is_sparse(x)) {
-            as(x, "SparseArraySeed")
+            as(x, "SVT_SparseArray")
         } else {
             ## When 'BACKEND' is NULL, realize() will act as a no-op on an
             ## ordinary matrix or array.

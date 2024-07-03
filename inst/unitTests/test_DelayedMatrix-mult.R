@@ -1,24 +1,6 @@
 #setAutoRealizationBackend("RleArray")
 #setAutoRealizationBackend("HDF5Array")
 
-### Temporary workaround to make read_block(..., as.sparse=TRUE) work on
-### a SVT_SparseArray object. Won't be needed anymore once read_block()
-### gets switch from OLD_extract_sparse_array() to extract_sparse_array().
-### TODO: Make sure to get rid of this when switching read_block()
-### from OLD_extract_sparse_array() to extract_sparse_array().
-setAs("COO_SparseArray", "SparseArraySeed",
-    function(from)
-        SparseArraySeed(dim(from), nzindex=nzcoo(from),
-                                   nzdata=nzdata(from),
-                                   dimnames=dimnames(from))
-)
-setMethod(OLD_extract_sparse_array, "SVT_SparseArray",
-    function(x, index) {
-        svt <- extract_sparse_array(x, index)
-        as(as(svt, "COO_SparseArray"), "SparseArraySeed")
-    }
-)
-
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Test BLOCK_mult_Lgrid() and BLOCK_mult_Rgrid()
