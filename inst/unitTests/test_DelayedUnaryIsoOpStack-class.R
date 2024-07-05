@@ -145,29 +145,38 @@ test_DelayedUnaryIsoOpStack_API <- function()
     .basic_checks_on_DelayedOp_with_DIM3(.TEST_ARRAY3, x3)
     .check_extract_sparse_array_on_DelayedOp_with_DIM3(.TEST_ARRAY3, x3)
 
-    ## 4. Sparse seed -- 1 / (log(a)^2 + 1)
+    ## 4. Sparse seed -- != 0
+
+    OPS <- list(function(a) a != 0L)
+    x4 <- new_DelayedUnaryIsoOpStack(.TEST_SVT3, OPS)
+
+    a4 <- .TEST_ARRAY3 != 0L
+    .basic_checks_on_DelayedOp_with_DIM3(a4, x4)
+    .check_extract_sparse_array_on_DelayedOp_with_DIM3(a4, x4)
+
+    ## 5. Sparse seed -- 1 / (log(a)^2 + 1)
 
     OPS <- list(function(a) log(a),
                 function(a) a^2 + 1,
                 function(a) 1 / a)
-    x4 <- new_DelayedUnaryIsoOpStack(.TEST_SVT3, OPS)
+    x5 <- new_DelayedUnaryIsoOpStack(.TEST_SVT3, OPS)
 
-    a4 <- 1 / (log(.TEST_ARRAY3)^2 + 1)
-    .basic_checks_on_DelayedOp_with_DIM3(a4, x4)
-    .check_extract_sparse_array_on_DelayedOp_with_DIM3(a4, x4)
+    a5 <- 1 / (log(.TEST_ARRAY3)^2 + 1)
+    .basic_checks_on_DelayedOp_with_DIM3(a5, x5)
+    .check_extract_sparse_array_on_DelayedOp_with_DIM3(a5, x5)
 
-    ## 5. Sparse seed but structural sparsity NOT propagated because
+    ## 6. Sparse seed but structural sparsity NOT propagated because
     ##    the stack of operations doesn't preserve the zeros
 
     OPS <- list(function(a) cos(a),
                 function(a) log(a^2 + 1))
-    x5 <- new_DelayedUnaryIsoOpStack(.TEST_SVT3, OPS)
+    x6 <- new_DelayedUnaryIsoOpStack(.TEST_SVT3, OPS)
 
-    a5 <- log(cos(.TEST_ARRAY3)^2 + 1)  # does not preserve the zeros
-    checkIdentical(dim(a5), dim(x5))
-    checkIdentical(dimnames(a5), dimnames(x5))
-    checkIdentical(a5, as.array(x5))
+    a6 <- log(cos(.TEST_ARRAY3)^2 + 1)  # does not preserve the zeros
+    checkIdentical(dim(a6), dim(x6))
+    checkIdentical(dimnames(a6), dimnames(x6))
+    checkIdentical(a6, as.array(x6))
 
-    checkIdentical(FALSE, is_sparse(x5))  # structural sparsity not propagated!
+    checkIdentical(FALSE, is_sparse(x6))  # structural sparsity not propagated!
 }
 

@@ -51,6 +51,9 @@
      ---
      THIS STEP WAS COMPLETED ON JULY 2, 2024.
 
+- Change 'as.sparse' default from FALSE to NA in blockApply() and
+  blockReduce(). Consistent with S4Arrays::read_block().
+
 - Add unit tests for DelayedOp subclasses DelayedSubassign and DelayedAbind.
 
 - Backend classes (e.g. HDF5Array) should be defined as:

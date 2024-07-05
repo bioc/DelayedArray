@@ -168,6 +168,7 @@ setMethod("extract_sparse_array", "DelayedUnaryIsoOpStack",
         for (OP in x@OPS)
             svt_nzvals <- OP(svt_nzvals)
         nzvals(svt) <- svt_nzvals
+        type(svt) <- type(svt_nzvals)
         svt
     }
 )
