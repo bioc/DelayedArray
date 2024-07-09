@@ -3,7 +3,7 @@ new_DelayedUnaryIsoOpWithArgs <- DelayedArray:::new_DelayedUnaryIsoOpWithArgs
 .TEST_MATRIX2a <- matrix(c(5:-2, rep.int(c(0L, 99L), 11)), ncol=6,
                          dimnames=list(NULL, LETTERS[1:6]))
 
-.TEST_SVT3 <- poissonSparseArray(c(40, 100, 1), lambda=0)
+.TEST_SVT3 <- SVT_SparseArray(dim=c(40, 100, 1))
 .TEST_SVT3[Lindex2Mindex(1:50, c(10, 5, 1))] <- 1:50
 
 .TEST_ARRAY3 <- as.array(.TEST_SVT3)

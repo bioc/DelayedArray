@@ -25,11 +25,11 @@ set.seed(99L)
                                      NULL,
                                      c("b1", "b2")))
 
-.TEST_SVT4c <- poissonSparseArray(.TEST_DIM4, lambda=0)
+.TEST_SVT4c <- SVT_SparseArray(dim=.TEST_DIM4)
 .TEST_SVT4c[51:130] <- 51:130
 .TEST_ARRAY4c <- as.array(.TEST_SVT4c)
 
-.TEST_SVT4d <- poissonSparseArray(.TEST_DIM4, lambda=0)
+.TEST_SVT4d <- SVT_SparseArray(dim=.TEST_DIM4)
 .TEST_SVT4d[11:110] <- runif(100, max=150)
 .TEST_ARRAY4d <- as.array(.TEST_SVT4d)
 

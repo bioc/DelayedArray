@@ -36,6 +36,8 @@ BLOCK_write_to_sink <- function(sink, x, verbose=NA)
         } else {
             block <- read_block(x, viewport, as.sparse=NA)
         }
+        ## 'block' is either an ordinary array or SparseArray derivative
+        ## (SVT_SparseArray or COO_SparseArray object).
         if (verbose)
             message("\\ Writing it ... ", appendLF=FALSE)
         sink <- write_block(sink, viewport, block)

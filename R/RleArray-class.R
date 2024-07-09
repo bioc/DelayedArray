@@ -166,8 +166,10 @@ setAs("DelayedMatrix", "DataFrame",
 setMethod("write_block", "RleRealizationSink",
     function(sink, viewport, block)
     {
+        ## 'block' is either an ordinary array or SparseArray derivative
+        ## (SVT_SparseArray or COO_SparseArray object).
         ## 'viewport' is ignored!
-        append_Rle_to_sink(Rle(block), sink)
+        append_Rle_to_sink(Rle(as.vector(block)), sink)
         sink
     }
 )

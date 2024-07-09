@@ -9,7 +9,7 @@ LOGIC_OPS   <- c("&", "|")  # currently untested
 .make_toy_svt1 <- function()
 {
     dim1 <- c(5L, 10L, 3L)
-    svt1 <- poissonSparseArray(dim1, lambda=0)
+    svt1 <- SVT_SparseArray(dim=dim1)
     nzvals1 <- 24:-9
     nzvals1[2:3] <- NA
     nzvals1[4:5] <- 0L
