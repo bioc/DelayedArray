@@ -4,26 +4,22 @@
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### BLOCK_which()
+### BLOCK_which() and BLOCK_nzwhich()
 ###
+### Both functions:
+### - return an L-index (if 'arr.ind=FALSE') or M-index (if 'arr.ind=TRUE');
+### - are directly used in the unit tests.
 
-.Mindex_order <- function(Mindex)
-{
-    cols <- lapply(ncol(Mindex):1, function(j) Mindex[ , j])
-    do.call(order, cols)
-}
-
-### 'x' is **trusted** to be a logical array-like object.
-### Return an L-index (if 'arr.ind=FALSE') or M-index (if 'arr.ind=TRUE').
-### Used in unit tests!
-BLOCK_which <- function(x, arr.ind=FALSE, grid=NULL, as.sparse=NA)
+.BLOCK_whichFUN <- function(x, whichFUN, arr.ind=FALSE, grid=NULL, as.sparse=NA)
 {
     if (!isTRUEorFALSE(arr.ind))
         stop("'arr.ind' must be TRUE or FALSE")
-    FUN <- function(block, arr.ind) {
+    whichFUN <- match.fun(whichFUN)
+    FUN <- function(block, whichFUN, arr.ind) {
         bid <- currentBlockId()
-        ## 'block' is either an ordinary array or SVT_SparseArray object.
-        minor <- which(block)
+        ## 'block' is either an ordinary array or SparseArray derivative
+        ## (SVT_SparseArray or COO_SparseArray object).
+        minor <- whichFUN(block)
         major <- rep.int(bid, length(minor))
         grid <- effectiveGrid()
         Mindex <- mapToRef(major, minor, grid, linear=TRUE)
@@ -31,16 +27,25 @@ BLOCK_which <- function(x, arr.ind=FALSE, grid=NULL, as.sparse=NA)
             return(Mindex)
         Mindex2Lindex(Mindex, refdim(grid))
     }
-    block_results <- blockApply(x, FUN, arr.ind, grid=grid, as.sparse=as.sparse)
+    block_results <- blockApply(x, FUN, whichFUN, arr.ind,
+                                grid=grid, as.sparse=as.sparse)
     if (arr.ind) {
         Mindex <- do.call(rbind, block_results)
-        oo <- .Mindex_order(Mindex)
+        oo <- S4Arrays:::Mindex_order(Mindex)
         ans <- Mindex[oo, , drop=FALSE]
     } else {
         ans <- sort(unlist(block_results))
     }
     ans
 }
+
+### 'x' is trusted to be a logical array-like object.
+BLOCK_which <- function(x, arr.ind=FALSE, grid=NULL, as.sparse=NA)
+    .BLOCK_whichFUN(x, which, arr.ind=arr.ind, grid=grid, as.sparse=as.sparse)
+
+### 'x' is trusted to be an array-like object.
+BLOCK_nzwhich <- function(x, arr.ind=FALSE, grid=NULL, as.sparse=NA)
+    .BLOCK_whichFUN(x, nzwhich, arr.ind=arr.ind, grid=grid, as.sparse=as.sparse)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

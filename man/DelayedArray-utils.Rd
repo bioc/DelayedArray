@@ -48,6 +48,7 @@
 
 \alias{anyNA,DelayedArray-method}
 \alias{which,DelayedArray-method}
+\alias{nzwhich,DelayedArray-method}
 
 \alias{unique}
 \alias{unique.DelayedArray}
@@ -105,7 +106,7 @@
 
   Block-processed operations:
   \itemize{
-    \item \code{anyNA}, \code{which}
+    \item \code{anyNA}, \code{which}, \code{nzwhich}
     \item \code{unique}, \code{table}
     \item all the members of the \code{\link[methods]{Summary}} group
     \item \code{mean}

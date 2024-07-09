@@ -435,7 +435,7 @@ setMethod("anyNA", "DelayedArray", .anyNA_DelayedArray)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### which()
+### which() and nzwhich() methods
 ###
 
 .which_DelayedArray <- function(x, arr.ind=FALSE, useNames=TRUE)
@@ -445,8 +445,11 @@ setMethod("anyNA", "DelayedArray", .anyNA_DelayedArray)
                      "a DelayedArray object or derivative"))
     BLOCK_which(x, arr.ind=arr.ind)
 }
-
 setMethod("which", "DelayedArray", .which_DelayedArray)
+
+setMethod("nzwhich", "DelayedArray",
+    function(x, arr.ind=FALSE) BLOCK_nzwhich(x, arr.ind=arr.ind)
+)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -39,7 +39,8 @@ BLOCK_rowSums <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        ## 'block' is either an ordinary matrix or SparseMatrix derivative
+        ## (SVT_SparseMatrix or COO_SparseMatrix object).
         init + MatrixGenerics::rowSums(block, na.rm=na.rm)
     }
     FUN_MoreArgs <- list(na.rm=na.rm)
@@ -66,7 +67,8 @@ BLOCK_colSums <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        ## 'block' is either an ordinary matrix or SparseMatrix derivative
+        ## (SVT_SparseMatrix or COO_SparseMatrix object).
         init + MatrixGenerics::colSums(block, na.rm=na.rm)
     }
     FUN_MoreArgs <- list(na.rm=na.rm)
@@ -112,7 +114,8 @@ setMethod("colSums", "DelayedMatrix", .colSums_DelayedMatrix)
 
 .row_sums_and_nvals <- function(x, na.rm=FALSE)
 {
-    ## 'x' is either an ordinary matrix or SVT_SparseMatrix object.
+    ## 'x' is either an ordinary matrix or SparseMatrix derivative
+    ## (SVT_SparseMatrix or COO_SparseMatrix object).
     row_sums <- MatrixGenerics::rowSums(x, na.rm=na.rm)
     row_nvals <- rep.int(ncol(x), nrow(x))
     if (na.rm)
@@ -122,7 +125,8 @@ setMethod("colSums", "DelayedMatrix", .colSums_DelayedMatrix)
 
 .col_sums_and_nvals <- function(x, na.rm=FALSE)
 {
-    ## 'x' is either an ordinary matrix or SVT_SparseMatrix object.
+    ## 'x' is either an ordinary matrix or SparseMatrix derivative
+    ## (SVT_SparseMatrix or COO_SparseMatrix object).
     col_sums <- MatrixGenerics::colSums(x, na.rm=na.rm)
     col_nvals <- rep.int(nrow(x), ncol(x))
     if (na.rm)
@@ -237,7 +241,8 @@ BLOCK_rowMins <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        ## 'block' is either an ordinary matrix or SparseMatrix derivative
+        ## (SVT_SparseMatrix or COO_SparseMatrix object).
         block_rowmins <- MatrixGenerics::rowMins(block, na.rm=na.rm,
                                                  useNames=FALSE)
         if (is.null(init))
@@ -275,7 +280,8 @@ BLOCK_colMins <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        ## 'block' is either an ordinary matrix or SparseMatrix derivative
+        ## (SVT_SparseMatrix or COO_SparseMatrix object).
         block_colmins <- MatrixGenerics::colMins(block, na.rm=na.rm,
                                                  useNames=FALSE)
         if (is.null(init))
@@ -347,7 +353,8 @@ BLOCK_rowMaxs <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        ## 'block' is either an ordinary matrix or SparseMatrix derivative
+        ## (SVT_SparseMatrix or COO_SparseMatrix object).
         block_rowmaxs <- MatrixGenerics::rowMaxs(block, na.rm=na.rm,
                                                  useNames=FALSE)
         if (is.null(init))
@@ -385,7 +392,8 @@ BLOCK_colMaxs <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        ## 'block' is either an ordinary matrix or SparseMatrix derivative
+        ## (SVT_SparseMatrix or COO_SparseMatrix object).
         block_colmaxs <- MatrixGenerics::colMaxs(block, na.rm=na.rm,
                                                  useNames=FALSE)
         if (is.null(init))
@@ -450,7 +458,8 @@ BLOCK_rowRanges <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        ## 'block' is either an ordinary matrix or SparseMatrix derivative
+        ## (SVT_SparseMatrix or COO_SparseMatrix object).
         block_rowranges <- MatrixGenerics::rowRanges(block, na.rm=na.rm,
                                                      useNames=FALSE)
         if (is.null(init))
@@ -489,7 +498,8 @@ BLOCK_colRanges <- function(x, na.rm=FALSE, useNames=TRUE,
     INIT_MoreArgs <- list()
 
     FUN <- function(init, block, na.rm=FALSE) {
-        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        ## 'block' is either an ordinary matrix or SparseMatrix derivative
+        ## (SVT_SparseMatrix or COO_SparseMatrix object).
         block_colranges <- MatrixGenerics::colRanges(block, na.rm=na.rm,
                                                      useNames=FALSE)
         if (is.null(init))
@@ -545,14 +555,15 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
 
     blockApply(x,
         function(block, na.rm, center) {
-            ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
             if (is.null(center)) {
                 block_center <- NULL
             } else {
                 viewport_range1 <- ranges(currentViewport())[1L]
                 block_center <- extractROWS(center, viewport_range1)
             }
-            rowVars(block, na.rm=na.rm, center=block_center, useNames=FALSE)
+            ## 'block' is either an ordinary matrix or SparseMatrix derivative
+            ## (SVT_SparseMatrix or COO_SparseMatrix object).
+            MatrixGenerics::rowVars(block, na.rm=na.rm, center=block_center, useNames=FALSE)
         },
         na.rm, center,
         grid=grid, as.sparse=as.sparse,
@@ -570,14 +581,15 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
 
     blockApply(x,
         function(block, na.rm, center) {
-            ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
             if (is.null(center)) {
                 block_center <- NULL
             } else {
                 viewport_range2 <- ranges(currentViewport())[2L]
                 block_center <- extractROWS(center, viewport_range2)
             }
-            colVars(block, na.rm=na.rm, center=block_center, useNames=FALSE)
+            ## 'block' is either an ordinary matrix or SparseMatrix derivative
+            ## (SVT_SparseMatrix or COO_SparseMatrix object).
+            MatrixGenerics::colVars(block, na.rm=na.rm, center=block_center, useNames=FALSE)
         },
         na.rm, center,
         grid=grid, as.sparse=as.sparse,
@@ -622,7 +634,8 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
     FINAL <- function(init, i, grid) { init$sum2 / (init$nval - 1L) }
 
     FUN <- function(init, block, na.rm, center) {
-        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        ## 'block' is either an ordinary matrix or SparseMatrix derivative
+        ## (SVT_SparseMatrix or COO_SparseMatrix object).
         if (is.null(center)) {
             block_center <- init$center
         } else {
@@ -636,8 +649,9 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
         delta <- block
         if (block_center != 0)
             delta <- as.matrix(delta) - block_center
-        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
-        block_sums2 <- rowSums(delta * delta, na.rm=na.rm)
+        ## 'delta' is either an ordinary matrix or SparseMatrix derivative
+        ## (SVT_SparseMatrix or COO_SparseMatrix object).
+        block_sums2 <- MatrixGenerics::rowSums(delta * delta, na.rm=na.rm)
         if (is.null(center)) {
             init$sum2 <- init$sum2 + block_sums2
             init
@@ -690,7 +704,8 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
     FINAL <- function(init, j, grid) { init$sum2 / (init$nval - 1L) }
 
     FUN <- function(init, block, na.rm, center) {
-        ## 'block' is either an ordinary matrix or SVT_SparseMatrix object.
+        ## 'block' is either an ordinary matrix or SparseMatrix derivative
+        ## (SVT_SparseMatrix or COO_SparseMatrix object).
         if (is.null(center)) {
             block_center <- init$center
         } else {
@@ -704,8 +719,9 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
         delta <- block
         if (block_center != 0)
             delta <- as.matrix(delta) - rep(block_center, each=nrow(block))
-        ## 'delta' is either an ordinary matrix or SVT_SparseMatrix object.
-        block_sums2 <- colSums(delta * delta, na.rm=na.rm)
+        ## 'delta' is either an ordinary matrix or SparseMatrix derivative
+        ## (SVT_SparseMatrix or COO_SparseMatrix object).
+        block_sums2 <- MatrixGenerics::colSums(delta * delta, na.rm=na.rm)
         if (is.null(center)) {
             init$sum2 <- init$sum2 + block_sums2
             init

@@ -302,31 +302,67 @@ test_DelayedArray_anyNA <- function()
 
 test_DelayedArray_which <- function()
 {
-    on.exit(suppressMessages(setAutoBlockSize()))
-    BLOCK_which <- DelayedArray:::BLOCK_which
-
-    a1 <- as.array(.make_toy_svt1())  # integer 3D array
-    a <- a1 >= 1L  # logical 3D array
-    A <- DelayedArray(realize(a))
-    target1 <- which(a)
-    target2 <- which(a, arr.ind=TRUE, useNames=FALSE)
-    for (block_size in .BLOCK_SIZES1) {
-        suppressMessages(setAutoBlockSize(block_size))
-        checkIdentical(target1, which(A))
-        checkIdentical(target2, which(A, arr.ind=TRUE))
-        checkIdentical(target1, BLOCK_which(a))
+    do_which_tests <- function(svt, block_sizes) {
+        on.exit(suppressMessages(setAutoBlockSize()))
+        BLOCK_which <- DelayedArray:::BLOCK_which
+        a <- as.array(svt)
+        A <- DelayedArray(realize(a))
+        B <- DelayedArray(realize(svt))
+        target1 <- which(a)
+        target2 <- which(a, arr.ind=TRUE, useNames=FALSE)
+        ## TODO: Uncomment 4 tests below when which(<SVT_SparseArray>)
+        ## is ready.
+        for (block_size in block_sizes) {
+            suppressMessages(setAutoBlockSize(block_size))
+            checkIdentical(target1, which(A))
+            #checkIdentical(target1, which(B))
+            checkIdentical(target1, BLOCK_which(a))
+            #checkIdentical(target1, BLOCK_which(svt))
+            checkIdentical(target2, which(A, arr.ind=TRUE))
+            #checkIdentical(target2, which(B, arr.ind=TRUE))
+            checkIdentical(target2, BLOCK_which(a, arr.ind=TRUE))
+            #checkIdentical(target2, BLOCK_which(svt, arr.ind=TRUE))
+        }
     }
 
-    a <- a1 == -100L    # all FALSE
-    A <- DelayedArray(realize(a))
-    target1 <- integer(0)
-    target2 <- matrix(integer(0), ncol=3)
-    for (block_size in .BLOCK_SIZES1) {
-        suppressMessages(setAutoBlockSize(block_size))
-        checkIdentical(target1, which(A))
-        checkIdentical(target2, which(A, arr.ind=TRUE))
-        checkIdentical(target1, BLOCK_which(a))
+    # logical 3D array
+    svt <- .make_toy_svt1() >= 1L
+    do_which_tests(svt, .BLOCK_SIZES1)
+
+    # logical 3D array with only FALSE/NA values
+    svt <- .make_toy_svt1() == -100L
+    do_which_tests(svt, .BLOCK_SIZES1)
+}
+
+test_DelayedArray_nzwhich <- function()
+{
+    do_nzwhich_tests <- function(svt, block_sizes) {
+        on.exit(suppressMessages(setAutoBlockSize()))
+        BLOCK_nzwhich <- DelayedArray:::BLOCK_nzwhich
+        a <- as.array(svt)
+        A <- DelayedArray(realize(a))
+        B <- DelayedArray(realize(svt))
+        target1 <- nzwhich(svt)
+        target2 <- nzwhich(svt, arr.ind=TRUE)
+        for (block_size in block_sizes) {
+            suppressMessages(setAutoBlockSize(block_size))
+            checkIdentical(target1, nzwhich(A))
+            checkIdentical(target1, nzwhich(B))
+            checkIdentical(target1, BLOCK_nzwhich(a))
+            checkIdentical(target1, BLOCK_nzwhich(svt))
+            checkIdentical(target2, nzwhich(A, arr.ind=TRUE))
+            checkIdentical(target2, nzwhich(B, arr.ind=TRUE))
+            checkIdentical(target2, BLOCK_nzwhich(a, arr.ind=TRUE))
+            checkIdentical(target2, BLOCK_nzwhich(svt, arr.ind=TRUE))
+        }
     }
+
+    # integer 3D array
+    svt1 <- .make_toy_svt1()
+    do_nzwhich_tests(svt1, .BLOCK_SIZES1)
+
+    # logical 3D array
+    do_nzwhich_tests(svt1 >= 1L, .BLOCK_SIZES1)
 }
 
 test_DelayedArray_Summary <- function()
