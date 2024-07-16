@@ -55,6 +55,8 @@
                          BACKEND, sink_rownames, sink_colnames, ...)
 }
 
+### x, y: "big" and "small" operands, respectively (see BLOCK_mult_Lgrid()
+### below for the details).
 ### INIT, BLOCK_OP: callback functions.
 ### INIT() must take 3 arguments: i (or j), grid, y.
 ### BLOCK_OP() must take 3 arguments: x_block, y, vp_ranges.
@@ -151,6 +153,8 @@
     }
 }
 
+### x, y: "small" and "big" operands, respectively (see BLOCK_mult_Rgrid()
+### below for the details).
 ### INIT, BLOCK_OP: callback functions.
 ### INIT() must take 3 arguments: j (or i), grid, x.
 ### BLOCK_OP() must take 3 arguments: x, y_block, vp_ranges.
@@ -262,15 +266,34 @@
 ### realization of a matrix of type complex?
 ###
 
-### Supported matrix-like objects must support [ as well as native %*%,
-### crossprod(), and tcrossprod() with the blocks returned by read_block()
-### (i.e. which are either ordinary matrices or SparseMatrix objects).
 .is_supported <- function(x)
     is.matrix(x) || is(x, "sparseMatrix") || is(x, "SparseMatrix")
 
-### x: a matrix-like object (typically a DelayedMatrix).
-### y: an ordinary matrix or other supported object (see .is_supported above).
-### Lgrid: an array grid (ArrayGrid object) defined on 'x'.
+### We need to make sure to return a matrix-like object that supports [ as
+### well as native %*%, crossprod(), and tcrossprod() with the blocks returned
+### by read_block() (which are either ordinary matrices or SparseMatrix
+### derivatives).
+### See the BLOCK_OP() callback functions defined and used in
+### BLOCK_mult_Lgrid() and BLOCK_mult_Rgrid() below for what operations will
+### effectively be performed on the "small operand".
+.normalize_small_operand <- function(x, argname)
+{
+    if (is(x, "COO_SparseMatrix"))
+        return(as(x, "SVT_SparseMatrix"))
+    if (is.matrix(x) || is(x, "sparseMatrix") || is(x, "SparseMatrix"))
+        return(x)
+    stop(wmsg("this operation does not support '", argname, "' ",
+              "of class ", class(x)[[1L]]))
+}
+
+### x: A matrix-like object (typically a DelayedMatrix) on which a grid will
+### be defined and from which blocks will get extracted. This will typically
+### be the biggest of the two operands of the binary matrix operation.
+### y: Typically an ordinary matrix or SVT_SparseMatrix object but other
+### matrix-like objects are supported (see .normalize_small_operand() above).
+### This will typically be the smallest of the two operands of the binary
+### matrix operation.
+### Lgrid: An array grid (ArrayGrid object) defined on 'x'.
 ### Walks on the matrix blocks defined by 'Lgrid'.
 ### If 'BACKEND' is NULL, returns an ordinary matrix. Otherwise, returns
 ### a DelayedMatrix object that is either pristine or the result of rbind'ing
@@ -288,12 +311,8 @@ BLOCK_mult_Lgrid <- function(x, y, Lgrid=NULL, as.sparse=NA,
                                    BACKEND=getAutoRealizationBackend(), ...,
                                    dry.run=FALSE)
 {
-    ## See the BLOCK_OP() callback functions below for what operations will
-    ## effectively be performed on 'y'.
-    if (!.is_supported(y))
-        stop(wmsg("this operation does not support 'y' ",
-                  "of class ", class(y)[[1L]]))
     stopifnot(length(dim(x)) == 2L)
+    y <- .normalize_small_operand(y, argname="y")
     op <- match.arg(op)
     transpose.x <- transpose.y <- FALSE
 
@@ -341,9 +360,14 @@ BLOCK_mult_Lgrid <- function(x, y, Lgrid=NULL, as.sparse=NA,
                        INIT, BLOCK_OP, BACKEND, ..., dry.run=dry.run)
 }
 
-### x: an ordinary matrix or other supported object (see .is_supported above).
-### y: a matrix-like object (typically a DelayedMatrix).
-### Rgrid: an array grid (ArrayGrid object) defined on 'y'.
+### x: Typically an ordinary matrix or SVT_SparseMatrix object but other
+### matrix-like objects are supported (see .normalize_small_operand() above).
+### This will typically be the smallest of the two operands of the binary
+### matrix operation.
+### y: A matrix-like object (typically a DelayedMatrix) on which a grid will
+### be defined and from which blocks will get extracted. This will typically
+### be the biggest of the two operands of the binary matrix operation.
+### Rgrid: An array grid (ArrayGrid object) defined on 'y'.
 ### Walks on the matrix blocks defined by 'Rgrid'.
 ### If 'BACKEND' is NULL, returns an ordinary matrix. Otherwise, returns
 ### a DelayedMatrix object that is either pristine or the result of cbind'ing
@@ -356,12 +380,8 @@ BLOCK_mult_Rgrid <- function(x, y, Rgrid=NULL, as.sparse=NA,
                                    BACKEND=getAutoRealizationBackend(), ...,
                                    dry.run=FALSE)
 {
-    ## See the BLOCK_OP() callback functions below for what operations will
-    ## effectively be performed on 'x'.
-    if (!.is_supported(x))
-        stop(wmsg("this operation does not support 'x' ",
-                  "of class ", class(x)[[1L]]))
     stopifnot(length(dim(y)) == 2L)
+    x <- .normalize_small_operand(x, argname="x")
     op <- match.arg(op)
     transpose.x <- transpose.y <- FALSE
 

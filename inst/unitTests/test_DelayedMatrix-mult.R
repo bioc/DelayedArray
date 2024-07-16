@@ -36,16 +36,25 @@ test_BLOCK_mult_Lgrid_Rgrid <- function()
     ## Serial evaluation of:
     ##   <matrix> %*% <matrix>
     ##   <matrix> %*% <SVT_SparseMatrix>
+    ##   <matrix> %*% <COO_SparseMatrix>
     ##   <SVT_SparseMatrix> %*% <matrix>
     ##   <SVT_SparseMatrix> %*% <SVT_SparseMatrix>
+    ##   <SVT_SparseMatrix> %*% <COO_SparseMatrix>
+    ##   <COO_SparseMatrix> %*% <matrix>
+    ##   <COO_SparseMatrix> %*% <SVT_SparseMatrix>
+    ##   <COO_SparseMatrix> %*% <COO_SparseMatrix>
 
     library(HDF5Array)
     m1 <- matrix(1:12, ncol=3, dimnames=list(letters[1:4], NULL))
     m2 <- matrix(101:115, nrow=3, dimnames=list(NULL, LETTERS[1:5]))
     m12 <- m1 %*% m2
+    svt1 <- as(m1, "SVT_SparseMatrix")
+    coo1 <- as(svt1, "COO_SparseMatrix")
+    svt2 <- as(m2, "SVT_SparseMatrix")
+    coo2 <- as(svt2, "COO_SparseMatrix")
     for (block_len in c(1:4, 6L, length(m1), length(m2), 1000L)) {
-      for (x in list(m1, as(m1, "SVT_SparseMatrix"))) {
-        for (y in list(m2, as(m2, "SVT_SparseMatrix"))) {
+      for (x in list(m1, svt1, coo1)) {
+        for (y in list(m2, svt2, coo2)) {
           do_checks(m12, x, y, block_len, as.sparse=FALSE)
           do_checks(m12, x, y, block_len, as.sparse=FALSE, BACKEND="HDF5Array")
           do_checks(m12, x, y, block_len, as.sparse=TRUE)
@@ -80,17 +89,21 @@ test_BLOCK_mult_Lgrid_Rgrid <- function()
               as.sparse=FALSE, BPPARAM=snow2, BACKEND="HDF5Array")
 
     ## Serial evaluation of:
-    ##   <DelayedMatrix> %*% <matrix>
-    ##   <DelayedMatrix> %*% <SVT_SparseMatrix>
-    ##   <matrix> %*% <DelayedMatrix>
+    ##   <DelayedMatrix>    %*% <matrix>
+    ##   <DelayedMatrix>    %*% <SVT_SparseMatrix>
+    ##   <DelayedMatrix>    %*% <COO_SparseMatrix>
+    ##   <matrix>           %*% <DelayedMatrix>
     ##   <SVT_SparseMatrix> %*% <DelayedMatrix>
+    ##   <COO_SparseMatrix> %*% <DelayedMatrix>
 
     M1 <- writeHDF5Array(m1, chunkdim=c(2, 2))
     M3 <- cbind(log(as(m2, "HDF5Array")), t(M1))
     m3 <- as.matrix(M3)
     m13 <- m1 %*% m3
+    svt3 <- as(m3, "SVT_SparseMatrix")
+    coo3 <- as(svt3, "COO_SparseMatrix")
     for (block_len in c(1:4, 6L, length(m1), length(m3), 1000L)) {
-      for (y in list(m3, as(m3, "SVT_SparseMatrix"))) {
+      for (y in list(m3, svt3, coo3)) {
         grid1 <- defaultAutoGrid(M1, block.length=block_len)
         current <- BLOCK_mult_Lgrid(M1, y, Lgrid=grid1, as.sparse=FALSE,
                                            BPPARAM=NULL, BACKEND=NULL)
@@ -101,7 +114,7 @@ test_BLOCK_mult_Lgrid_Rgrid <- function()
         checkTrue(validObject(current, complete=TRUE))
         checkEquals(as.matrix(current), m13)
       }
-      for (x in list(m1, as(m1, "SVT_SparseMatrix"))) {
+      for (x in list(m1, svt1, coo1)) {
         grid3 <- defaultAutoGrid(M3, block.length=block_len)
         current <- BLOCK_mult_Rgrid(x, M3, Rgrid=grid3, as.sparse=FALSE,
                                            BPPARAM=NULL, BACKEND=NULL)
