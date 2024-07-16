@@ -255,19 +255,15 @@
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### BLOCK_mult_Lgrid() and BLOCK_mult_Rgrid()
 ###
-### These are the 2 workhorses behind block matrix multiplication between:
-###   - **any** matrix-like object (typically a DelayedMatrix),
-###   - an ordinary matrix (or other supported matrix-like object,
-###     see .is_supported() above).
+### These are the 2 workhorses behind block matrix multiplication between
+### a "big" and a "small" matrix-like object. See BLOCK_mult_Lgrid() and
+### BLOCK_mult_Rgrid() below for the details.
 ###
 ### Should be able to handle any type() supported by base::`%*%`, that is,
 ### integer, double, and complex. However, the realization backend specified
 ### via `BACKEND` might introduce some restrictions e.g. will it support
 ### realization of a matrix of type complex?
 ###
-
-.is_supported <- function(x)
-    is.matrix(x) || is(x, "sparseMatrix") || is(x, "SparseMatrix")
 
 ### We need to make sure to return a matrix-like object that supports [ as
 ### well as native %*%, crossprod(), and tcrossprod() with the blocks returned
@@ -434,7 +430,7 @@ BLOCK_mult_Rgrid <- function(x, y, Rgrid=NULL, as.sparse=NA,
 ### %*%, crossprod(), and tcrossprod() methods between:
 ###   - a DelayedMatrix object,
 ###   - an ordinary matrix or vector (or other supported matrix-like
-###     object, see .is_supported() above)
+###     object, see .normalize_small_operand() above)
 ###
 
 setMethod("%*%", c("DelayedMatrix", "ANY"),
