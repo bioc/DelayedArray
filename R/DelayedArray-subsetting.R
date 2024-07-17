@@ -104,6 +104,9 @@ BLOCK_nzwhich <- function(x, arr.ind=FALSE, grid=NULL, as.sparse=NA)
                 block_ans <- .extract_array_element(x, Mindex1)
             } else {
                 block <- read_block(x, grid[[bid]])
+                ## COO_SparseArray objects are not subsettable.
+                if (is(block, "COO_SparseArray"))
+                    block <- as(block, "SVT_SparseArray")
                 block_ans <- block[minor]
             }
             block_ans
