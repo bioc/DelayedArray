@@ -313,7 +313,7 @@ setMethod("[", "DelayedArray", .subset_DelayedArray)
     .Deprecated(msg=wmsg(msg))
     FUN <- function(block, arr.ind) {
         bid <- currentBlockId()
-        minor <- base::which(block != 0L)
+        minor <- nzwhich(block)
         major <- rep.int(bid, length(minor))
         grid <- effectiveGrid()
         nzindex <- mapToRef(major, minor, grid, linear=TRUE)
@@ -336,7 +336,7 @@ setAs("DelayedArray", "SparseArraySeed",
 {
     FUN <- function(block, arr.ind) {
         bid <- currentBlockId()
-        minor <- base::which(block != 0L)
+        minor <- nzwhich(block)
         major <- rep.int(bid, length(minor))
         grid <- effectiveGrid()
         nzcoo <- mapToRef(major, minor, grid, linear=TRUE)
