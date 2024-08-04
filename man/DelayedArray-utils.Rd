@@ -138,7 +138,7 @@
     \item \link{DelayedArray-stats} for statistical functions on
           \link{DelayedArray} objects.
 
-    \item \link{DelayedMatrix-stats} for \link{DelayedMatrix} row/col
+    \item \link{matrixStats-methods} for \link{DelayedMatrix} row/col
           summarization.
 
     \item \link{DelayedArray} objects.

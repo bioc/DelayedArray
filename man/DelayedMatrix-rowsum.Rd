@@ -59,7 +59,7 @@
           \code{\link{setAutoRealizationBackend}} for getting and setting
           the \emph{automatic realization backend}.
 
-    \item \link{DelayedMatrix-stats} for \link{DelayedMatrix} row/col
+    \item \link{matrixStats-methods} for \link{DelayedMatrix} row/col
           summarization.
 
     \item \link{DelayedMatrix-mult} for \link{DelayedMatrix} multiplication

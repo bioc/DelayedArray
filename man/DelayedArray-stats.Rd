@@ -82,7 +82,7 @@
           in the \pkg{stats} package for the corresponding operations
           on ordinary arrays or matrices.
 
-    \item \link{DelayedMatrix-stats} for \link{DelayedMatrix} row/col
+    \item \link{matrixStats-methods} for \link{DelayedMatrix} row/col
           summarization.
 
     \item \link{DelayedArray} objects.

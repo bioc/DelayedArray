@@ -193,7 +193,7 @@ type(x)
     \item \link{DelayedArray-stats} for statistical functions on
           DelayedArray objects.
 
-    \item \link{DelayedMatrix-stats} for DelayedMatrix row/col
+    \item \link{matrixStats-methods} for DelayedMatrix row/col
           summarization.
 
     \item \link{DelayedMatrix-rowsum} for \code{rowsum()} and

@@ -1,6 +1,6 @@
-\name{DelayedMatrix-stats}
+\name{matrixStats-methods}
 
-\alias{DelayedMatrix-stats}
+\alias{matrixStats-methods}
 
 \alias{rowSums}
 \alias{rowSums,DelayedMatrix-method}

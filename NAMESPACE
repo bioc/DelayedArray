@@ -321,7 +321,7 @@ export(
     ## DelayedArray-utils.R:
     pmax2, pmin2, apply, sweep, scale,
 
-    ## DelayedMatrix-stats.R:
+    ## matrixStats-methods.R:
     rowMaxs, colMaxs, rowMins, colMins, rowRanges, colRanges
 )
 

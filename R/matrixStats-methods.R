@@ -563,7 +563,8 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
             }
             ## 'block' is either an ordinary matrix or SparseMatrix derivative
             ## (SVT_SparseMatrix or COO_SparseMatrix object).
-            MatrixGenerics::rowVars(block, na.rm=na.rm, center=block_center, useNames=FALSE)
+            MatrixGenerics::rowVars(block, na.rm=na.rm, center=block_center,
+                                    useNames=FALSE)
         },
         na.rm, center,
         grid=grid, as.sparse=as.sparse,
@@ -589,7 +590,8 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
             }
             ## 'block' is either an ordinary matrix or SparseMatrix derivative
             ## (SVT_SparseMatrix or COO_SparseMatrix object).
-            MatrixGenerics::colVars(block, na.rm=na.rm, center=block_center, useNames=FALSE)
+            MatrixGenerics::colVars(block, na.rm=na.rm, center=block_center,
+                                    useNames=FALSE)
         },
         na.rm, center,
         grid=grid, as.sparse=as.sparse,
@@ -647,7 +649,10 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
                                MatrixGenerics::rowSums(is.na(block))
         }
         delta <- block
-        if (block_center != 0)
+        ## 'delta' could be a SparseMatrix derivative. However
+        ## adding/subtracting an ordinary vector to/from it is not
+        ## supported so we first turn it into an ordinary matrix.
+        if (length(nzwhich(block_center)) != 0L)
             delta <- as.matrix(delta) - block_center
         ## 'delta' is either an ordinary matrix or SparseMatrix derivative
         ## (SVT_SparseMatrix or COO_SparseMatrix object).
@@ -717,7 +722,10 @@ setMethod("colRanges", "DelayedMatrix", .colRanges_DelayedMatrix)
                                MatrixGenerics::colSums(is.na(block))
         }
         delta <- block
-        if (block_center != 0)
+        ## 'delta' could be a SparseMatrix derivative. However
+        ## adding/subtracting an ordinary vector to/from it is not
+        ## supported so we first turn it into an ordinary matrix.
+        if (length(nzwhich(block_center)) != 0L)
             delta <- as.matrix(delta) - rep(block_center, each=nrow(block))
         ## 'delta' is either an ordinary matrix or SparseMatrix derivative
         ## (SVT_SparseMatrix or COO_SparseMatrix object).
