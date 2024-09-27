@@ -14,6 +14,8 @@
 \alias{DelayedUnaryOp-class}
 \alias{DelayedUnaryOp}
 
+\alias{containsOutOfMemoryData,DelayedUnaryOp-method}
+
 % DelayedUnaryIsoOp objects
 \alias{class:DelayedUnaryIsoOp}
 \alias{DelayedUnaryIsoOp-class}
@@ -31,6 +33,8 @@
 \alias{class:DelayedNaryOp}
 \alias{DelayedNaryOp-class}
 \alias{DelayedNaryOp}
+
+\alias{containsOutOfMemoryData,DelayedNaryOp-method}
 
 % updateObject()
 \alias{updateObject,DelayedOp-method}

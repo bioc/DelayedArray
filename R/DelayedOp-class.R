@@ -81,6 +81,10 @@ setClass("DelayedUnaryOp",
 
 setValidity2("DelayedUnaryOp", .validate_DelayedUnaryOp)
 
+setMethod("containsOutOfMemoryData", "DelayedUnaryOp",
+    function(object) containsOutOfMemoryData(object@seed)
+)
+
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### DelayedUnaryIsoOp objects
@@ -172,6 +176,11 @@ setClass("DelayedNaryOp",
 }
 
 setValidity2("DelayedNaryOp", .validate_DelayedNaryOp)
+
+setMethod("containsOutOfMemoryData", "DelayedNaryOp",
+    function(object)
+        any(vapply(object@seeds, containsOutOfMemoryData, logical(1)))
+)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
