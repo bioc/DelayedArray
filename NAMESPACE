@@ -200,7 +200,6 @@ exportMethods(
     path, "path<-",
     table,
     type, "type<-",
-    containsOutOfMemoryData,
     updateObject,
     rowSums, colSums, rowMeans, colMeans,
 
