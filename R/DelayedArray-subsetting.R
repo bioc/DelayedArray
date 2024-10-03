@@ -355,9 +355,6 @@ setAs("DelayedArray", "SparseArraySeed",
 setAs("DelayedArray", "COO_SparseArray",
     function(from) .BLOCK_from_DelayedArray_to_COO_SparseArray(from)
 )
-setAs("DelayedArray", "SparseArray",
-    function(from) .BLOCK_from_DelayedArray_to_COO_SparseArray(from)
-)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

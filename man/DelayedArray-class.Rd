@@ -42,7 +42,6 @@
 
 \alias{coerce,DelayedArray,SparseArraySeed-method}
 \alias{coerce,DelayedArray,COO_SparseArray-method}
-\alias{coerce,DelayedArray,SparseArray-method}
 
 \alias{[[,DelayedArray-method}
 
