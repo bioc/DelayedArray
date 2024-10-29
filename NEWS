@@ -1,3 +1,34 @@
+CHANGES IN VERSION 0.32.0
+-------------------------
+
+NEW FEATURES
+
+    o Add nzwhich() method for DelayedArray objects (block-processed).
+
+    o Support %*%, crossprod(), and tcrossprod() between DelayedMatrix and
+      COO_SparseMatrix objects.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o The default realize() method now returns an SVT_SparseArray object
+      instead of an SparseArraySeed object when the array-like object to
+      realize is sparse and 'BACKEND' is NULL.
+
+    o Coercing a DelayedArray object or derivative to SparseArray should be
+      much more efficient (thanks to various tweaks that happened in the
+      SparseArray and HDF5Array packages).
+
+DEPRECATED AND DEFUNCT
+
+    o Deprecate SparseArraySeed objects.
+
+    o Deprecate OLD_extract_sparse_array() and read_sparse_block() generics
+      and methods.
+
+    o Fix bug in coercion from DelayedArray to SparseArray when the object to
+      coerce has NAs. See https://github.com/Bioconductor/HDF5Array/issues/61
+
+
 CHANGES IN VERSION 0.30.0
 -------------------------
 
