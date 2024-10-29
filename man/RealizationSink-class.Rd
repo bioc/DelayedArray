@@ -19,8 +19,6 @@
 \alias{registeredRealizationBackends}
 \alias{getAutoRealizationBackend}
 \alias{setAutoRealizationBackend}
-\alias{getRealizationBackend}
-\alias{setRealizationBackend}
 
 \alias{sinkApply}
 

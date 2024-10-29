@@ -242,18 +242,18 @@ export(
     setAutoBlockShape, getAutoBlockShape,
 
     ## AutoGrid.R:
-    defaultAutoGrid, blockGrid,
-    rowAutoGrid, rowGrid,
-    colAutoGrid, colGrid,
+    defaultAutoGrid,
+    rowAutoGrid,
+    colAutoGrid,
     setAutoGridMaker, getAutoGridMaker,
     defaultSinkAutoGrid,
-    defaultMultAutoGrids, multGrids,
+    defaultMultAutoGrids,
 
     ## blockApply.R:
     setAutoBPPARAM, getAutoBPPARAM,
     set_grid_context, effectiveGrid, currentBlockId, currentViewport,
-    gridApply, viewportApply, blockApply,
-    gridReduce, viewportReduce, blockReduce,
+    gridApply, blockApply,
+    gridReduce, blockReduce,
 
     ## showtree.R:
     showtree, seedApply, modify_seeds,
@@ -267,7 +267,6 @@ export(
     ## RealizationSink-class.R:
     registeredRealizationBackends, supportedRealizationBackends,
     getAutoRealizationBackend, setAutoRealizationBackend,
-    getRealizationBackend, setRealizationBackend,
     AutoRealizationSink,
     sinkApply,
 

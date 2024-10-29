@@ -90,12 +90,6 @@ getAutoRealizationBackend <- function()
     S4Arrays:::get_user_option("auto.realization.backend")
 }
 
-getRealizationBackend <- function()
-{
-    .Defunct("getAutoRealizationBackend")
-    getAutoRealizationBackend()
-}
-
 .REGISTERED_REALIZATION_BACKENDS <- data.frame(
     BACKEND=c("RleArray", "HDF5Array", "TENxMatrix"),
     package=c("DelayedArray", "HDF5Array", "HDF5Array"),
@@ -194,12 +188,6 @@ setAutoRealizationBackend <- function(BACKEND=NULL)
     }
     S4Arrays:::set_user_option("auto.realization.backend", BACKEND)
     return(invisible(NULL))
-}
-
-setRealizationBackend <- function(...)
-{
-    .Defunct("setAutoRealizationBackend")
-    setAutoRealizationBackend(...)
 }
 
 

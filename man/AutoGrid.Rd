@@ -3,11 +3,8 @@
 \alias{AutoGrid}
 
 \alias{defaultAutoGrid}
-\alias{blockGrid}
 \alias{rowAutoGrid}
-\alias{rowGrid}
 \alias{colAutoGrid}
-\alias{colGrid}
 \alias{getAutoGridMaker}
 \alias{setAutoGridMaker}
 \alias{defaultSinkAutoGrid}

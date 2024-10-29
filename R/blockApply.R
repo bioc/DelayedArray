@@ -201,12 +201,6 @@ gridApply <- function(grid, FUN, ..., BPPARAM=getAutoBPPARAM(), verbose=NA)
                                           FUN, ..., BPPARAM=BPPARAM)
 }
 
-viewportApply <- function(...)
-{
-    .Defunct("gridApply")
-    gridApply(...)
-}
-
 blockApply <- function(x, FUN, ..., grid=NULL, as.sparse=FALSE,
                                     BPPARAM=getAutoBPPARAM(), verbose=NA)
 {
@@ -275,12 +269,6 @@ gridReduce <- function(FUN, grid, init, ..., BREAKIF=NULL, verbose=NA)
         }
     }
     init
-}
-
-viewportReduce <- function(...)
-{
-    .Defunct("gridReduce")
-    gridReduce(...)
 }
 
 blockReduce <- function(FUN, x, init, ..., BREAKIF=NULL,

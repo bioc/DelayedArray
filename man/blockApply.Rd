@@ -12,10 +12,8 @@
 \alias{currentViewport}
 
 \alias{gridApply}
-\alias{viewportApply}
 \alias{blockApply}
 \alias{gridReduce}
-\alias{viewportReduce}
 \alias{blockReduce}
 
 \title{blockApply() and family}

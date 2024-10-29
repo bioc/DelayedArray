@@ -93,12 +93,6 @@ defaultAutoGrid <-
     .block_grid(x_dim, block_len, chunk_grid, block_shape)
 }
 
-blockGrid <- function(...)
-{
-    .Defunct("defaultAutoGrid")
-    defaultAutoGrid(...)
-}
-
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### rowAutoGrid() and colAutoGrid()
@@ -147,12 +141,6 @@ rowAutoGrid <- function(x, nrow=NULL, block.length=NULL)
     RegularArrayGrid(x_dim, spacings)
 }
 
-rowGrid <- function(...)
-{
-    .Defunct("rowAutoGrid")
-    rowAutoGrid(...)
-}
-
 ### Return a RegularArrayGrid object describing a grid on matrix-like
 ### object 'x' where the grid elements are blocks made of full columns of 'x'.
 colAutoGrid <- function(x, ncol=NULL, block.length=NULL)
@@ -180,12 +168,6 @@ colAutoGrid <- function(x, ncol=NULL, block.length=NULL)
                       "Please specify a smaller 'ncol'."))
     }
     RegularArrayGrid(x_dim, spacings)
-}
-
-colGrid <- function(...)
-{
-    .Defunct("colAutoGrid")
-    colAutoGrid(...)
 }
 
 
@@ -501,11 +483,5 @@ defaultMultAutoGrids <-
     y_grid <- RegularArrayGrid(y_dim, abc[-1L])
     z_grid <- RegularArrayGrid(z_dim, abc[-2L])
     list(x_grid, y_grid, z_grid)
-}
-
-multGrids <- function(...)
-{
-    .Defunct("defaultMultAutoGrids")
-    defaultMultAutoGrids(...)
 }
 
