@@ -13,7 +13,6 @@
 
 \alias{is_sparse,DelayedNaryIsoOp-method}
 \alias{extract_sparse_array,DelayedNaryIsoOp-method}
-\alias{OLD_extract_sparse_array,DelayedNaryIsoOp-method}
 
 \alias{updateObject,ConformableSeedCombiner-method}
 

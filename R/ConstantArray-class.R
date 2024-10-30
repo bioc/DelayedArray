@@ -55,16 +55,6 @@ setMethod("extract_sparse_array", "ConstantArraySeed",
     }
 )
 
-setMethod("OLD_extract_sparse_array", "ConstantArraySeed",
-    function(x, index)
-    {
-        stopifnot(is_sparse(x))
-        ans_dim <- S4Arrays:::get_Nindex_lengths(index, dim(x))
-        ans_nzdata <- rep.int(x@value, 0L)
-        SparseArraySeed(ans_dim, nzdata=ans_nzdata, check=FALSE)
-    }
-)
-
 ConstantArraySeed <- function(dim, value=NA)
 {
     new2("ConstantArraySeed", dim=as.integer(dim), value=value)

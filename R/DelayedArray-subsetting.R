@@ -297,39 +297,13 @@ setMethod("[", "DelayedArray", .subset_DelayedArray)
 ### Coercion to sparse matrix
 ###
 
-### Calling dense2sparse() on a DelayedArray object works and triggers block
-### processing twice:
-###   - A 1st time when which() is called: this visits all the blocks.
-###   - A 2nd time for 'x[nzindex]': this visits only the blocks with
-###     nonzero values.
-### See dense2sparse() implementation in R/SparseArraySeed-class.R
-### .BLOCK_dense2sparse() is semantically equivalent to dense2sparse() but
-### it does a single pass (all blocks are visited only once) so is more
-### efficient (2x faster in average).
-.BLOCK_dense2sparse <- function(x, grid=NULL)
-{
-    msg <- c("coercion from DelayedArray to SparseArraySeed ",
-             "is deprecated in BioC >= 3.20")
-    .Deprecated(msg=wmsg(msg))
-    FUN <- function(block, arr.ind) {
-        bid <- currentBlockId()
-        minor <- nzwhich(block)
-        major <- rep.int(bid, length(minor))
-        grid <- effectiveGrid()
-        nzindex <- mapToRef(major, minor, grid, linear=TRUE)
-        nzdata <- block[minor]
-        list(nzindex, nzdata)
-    }
-    block_results <- blockApply(x, FUN, grid=grid)
-    nzindex_list <- lapply(block_results, `[[`, 1L)
-    nzdata_list <- lapply(block_results, `[[`, 2L)
-    nzindex <- do.call(rbind, nzindex_list)
-    nzdata <- unlist(nzdata_list, recursive=FALSE)
-    SparseArraySeed(dim(x), nzindex, nzdata, dimnames(x), check=FALSE)
-}
-
 setAs("DelayedArray", "SparseArraySeed",
-    function(from) .BLOCK_dense2sparse(from)
+    function(from)
+    {
+        msg <- c("coercion from DelayedArray to SparseArraySeed ",
+                 "is defunct in BioC >= 3.21")
+        .Defunct(msg=wmsg(msg))
+    }
 )
 
 .BLOCK_from_DelayedArray_to_COO_SparseArray <- function(x, grid=NULL)

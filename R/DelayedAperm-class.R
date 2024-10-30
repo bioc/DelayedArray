@@ -152,20 +152,6 @@ setMethod("extract_sparse_array", "DelayedAperm",
     }
 )
 
-### 'is_sparse(x)' is assumed to be TRUE and 'index' is assumed to
-### not contain duplicates. See "OLD_extract_sparse_array() Terms of Use"
-### in SparseArraySeed-class.R
-setMethod("OLD_extract_sparse_array", "DelayedAperm",
-    function(x, index)
-    {
-        seed_index <- project_index_on_seed(index, x)
-        sas <- OLD_extract_sparse_array(x@seed, seed_index)
-        sas <- aperm(sas, x@perm)
-        index[!is.na(x@perm)] <- list(NULL)
-        OLD_extract_sparse_array(sas, index)
-    }
-)
-
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Backward compatibility with DelayedArray < 0.5.24

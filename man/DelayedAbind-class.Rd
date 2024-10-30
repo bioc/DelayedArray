@@ -14,7 +14,6 @@
 
 \alias{is_sparse,DelayedAbind-method}
 \alias{extract_sparse_array,DelayedAbind-method}
-\alias{OLD_extract_sparse_array,DelayedAbind-method}
 
 \alias{updateObject,SeedBinder-method}
 

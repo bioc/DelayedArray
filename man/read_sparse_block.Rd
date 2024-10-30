@@ -1,15 +1,13 @@
 \name{read_sparse_block}
 
 \alias{read_sparse_block}
-\alias{read_sparse_block,ANY-method}
-\alias{read_sparse_block,SparseArraySeed-method}
 
 \title{read_sparse_block()}
 
 \description{
   An internal generic not meant to be called directly by the end user.
 
-  Deprecated in BioC >= 3.20.
+  Defunct in BioC >= 3.21.
 }
 
 \keyword{internal}

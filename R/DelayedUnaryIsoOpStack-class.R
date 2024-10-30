@@ -173,23 +173,3 @@ setMethod("extract_sparse_array", "DelayedUnaryIsoOpStack",
     }
 )
 
-### 'is_sparse(x)' is assumed to be TRUE and 'index' is assumed to
-### not contain duplicates. See "OLD_extract_sparse_array() Terms of Use"
-### in SparseArraySeed-class.R
-setMethod("OLD_extract_sparse_array", "DelayedUnaryIsoOpStack",
-    function(x, index)
-    {
-        ## Assuming that the caller respected "OLD_extract_sparse_array()
-        ## Terms of Use" (see SparseArraySeed-class.R), 'is_sparse(x)'
-        ## should be TRUE so we can assume that the operations in 'x@OPS'
-        ## preserve the zeros which means that we only need to apply them
-        ## to the nonzero data.
-        sas <- OLD_extract_sparse_array(x@seed, index)
-        sas_nzdata <- sas@nzdata
-        for (OP in x@OPS)
-            sas_nzdata <- OP(sas_nzdata)
-        sas@nzdata <- sas_nzdata
-        sas
-    }
-)
-

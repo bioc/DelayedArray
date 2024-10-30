@@ -12,7 +12,6 @@
 
 \alias{is_sparse,DelayedSubassign-method}
 \alias{extract_sparse_array,DelayedSubassign-method}
-\alias{OLD_extract_sparse_array,DelayedSubassign-method}
 
 \title{DelayedSubassign objects}
 

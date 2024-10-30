@@ -11,7 +11,6 @@
 
 \alias{is_sparse,DelayedUnaryIsoOpWithArgs-method}
 \alias{extract_sparse_array,DelayedUnaryIsoOpWithArgs-method}
-\alias{OLD_extract_sparse_array,DelayedUnaryIsoOpWithArgs-method}
 
 \title{DelayedUnaryIsoOpWithArgs objects}
 

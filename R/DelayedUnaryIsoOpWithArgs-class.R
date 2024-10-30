@@ -282,29 +282,3 @@ setMethod("extract_sparse_array", "DelayedUnaryIsoOpWithArgs",
     }
 )
 
-setMethod("OLD_extract_sparse_array", "DelayedUnaryIsoOpWithArgs",
-    function(x, index)
-    {
-        ## Assuming that the caller respected "OLD_extract_sparse_array() Terms
-        ## of Use" (see SparseArraySeed-class.R), 'is_sparse(x)' should be
-        ## TRUE so we can assume that the operation in x@OP preserves the
-        ## zeros and thus only need to apply them to the nonzero data.
-        sas <- OLD_extract_sparse_array(x@seed, index)
-
-        ## Subset the left and right arguments that go along a dimension.
-        Largs <- subset_args(x@Largs, x@Lalong, index)
-        Rargs <- subset_args(x@Rargs, x@Ralong, index)
-
-        ## Expanding to match the non-zero values.
-        sas_nzindex <- sas@nzindex
-        nzremap <- function(arg, MARGIN) {
-            extractROWS(arg, sas_nzindex[,MARGIN])
-        }
-        Largs <- mapply(nzremap, arg=Largs, MARGIN=x@Lalong, SIMPLIFY=FALSE)
-        Rargs <- mapply(nzremap, arg=Rargs, MARGIN=x@Ralong, SIMPLIFY=FALSE)
-
-        sas@nzdata <- do.call(x@OP, c(Largs, list(sas@nzdata), Rargs))
-        sas
-    }
-)
-

@@ -134,16 +134,6 @@ setMethod("extract_sparse_array", "DelayedNaryIsoOp",
     }
 )
 
-### 'is_sparse(x)' is assumed to be TRUE and 'index' is assumed to
-### not contain duplicates. See "OLD_extract_sparse_array() Terms of Use"
-### in SparseArraySeed-class.R
-setMethod("OLD_extract_sparse_array", "DelayedNaryIsoOp",
-    function(x, index)
-    {
-        stop("NOT IMPLEMENTED YET!")
-    }
-)
-
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Backward compatibility with DelayedArray < 0.5.24

@@ -14,7 +14,6 @@
 
 \alias{is_sparse,DelayedSubset-method}
 \alias{extract_sparse_array,DelayedSubset-method}
-\alias{OLD_extract_sparse_array,DelayedSubset-method}
 
 \title{DelayedSubset objects}
 

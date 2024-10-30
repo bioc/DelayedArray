@@ -2,7 +2,7 @@
 ### SparseArraySeed objects
 ### -------------------------------------------------------------------------
 
-### Everything in this file is deprecated in BioC >= 3.20!
+### Everything in this file is defunct in BioC >= 3.21!
 
 setClass("SparseArraySeed",
     contains="Array",
@@ -21,188 +21,61 @@ setClass("SparseArraySeed",
     )
 )
 
-### API:
-### - Getters/setters: dim(), length(), nzindex(), nzdata(),
-###                    dimnames(), dimnames<-()
-### - sparsity().
-### - dense2sparse(), sparse2dense().
-### - Based on sparse2dense(): extract_array(), as.array(), as.matrix().
-### - Based on dense2sparse(): coercion to SparseArraySeed.
-### - Back and forth coercion between SparseArraySeed and dg[C|R]Matrix or
-###   lg[C|R]Matrix objects from the Matrix package.
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Validity
-###
-
-.validate_nzindex_slot <- function(x)
-{
-    x_nzindex <- x@nzindex
-    if (!(is.matrix(x_nzindex) && typeof(x_nzindex) == "integer"))
-        return("'nzindex' slot must be an integer matrix")
-    x_dim <- x@dim
-    if (ncol(x_nzindex) != length(x_dim))
-        return(paste0("'nzindex' slot must be a matrix with ",
-                      "one column per dimension"))
-    for (along in seq_along(x_dim)) {
-        not_ok <- S4Vectors:::anyMissingOrOutside(x_nzindex[ , along],
-                                                  1L, x_dim[[along]])
-        if (not_ok)
-            return(paste0("'nzindex' slot must contain valid indices, ",
-                          "that is, indices that are not NA and are ",
-                          ">= 1 and <= their corresponding dimension"))
+setGeneric("nzindex",
+    function(x)
+    {
+        msg <- "nzindex() is defunct in BioC >= 3.21"
+        .Defunct(msg=wmsg(msg))
     }
-    TRUE
-}
+)
 
-.validate_nzdata_slot <- function(x)
-{
-    x_nzdata <- x@nzdata
-    if (!(is.vector(x_nzdata) && length(x_nzdata) == nrow(x@nzindex)))
-        return(paste0("'nzdata' slot must be a vector of length ",
-                      "the number of rows in the 'nzindex' slot"))
-    TRUE
-}
+setMethod("nzdata", "SparseArraySeed",
+    function(x)
+    {
+        msg <- c("nzdata() getter for SparseArraySeed objects ",
+                 "is defunct in BioC >= 3.21")
+        .Defunct(msg=wmsg(msg))
+    }
+)
 
-.validate_SparseArraySeed <- function(x)
-{
-    msg <- S4Arrays:::validate_dim_slot(x, "dim")
-    if (!isTRUE(msg))
-        return(msg)
-    msg <- .validate_nzindex_slot(x)
-    if (!isTRUE(msg))
-        return(msg)
-    msg <- .validate_nzdata_slot(x)
-    if (!isTRUE(msg))
-        return(msg)
-    msg <- S4Arrays:::validate_dimnames_slot(x, x@dim)
-    if (!isTRUE(msg))
-        return(msg)
-    TRUE
-}
-
-setValidity2("SparseArraySeed", .validate_SparseArraySeed)
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Getters/setters
-###
-
-setGeneric("nzindex", function(x) standardGeneric("nzindex"))
-setMethod("nzindex", "SparseArraySeed", function(x) x@nzindex)
-
-setMethod("nzdata", "SparseArraySeed", function(x) x@nzdata)
+setMethod("dim", "SparseArraySeed",
+    function(x)
+    {
+        msg <- c("dim() getter for SparseArraySeed objects ",
+                 "is defunct in BioC >= 3.21")
+        .Defunct(msg=wmsg(msg))
+    }
+)
 
 setMethod("dimnames", "SparseArraySeed",
-    function(x) S4Arrays:::simplify_NULL_dimnames(x@dimnames)
+    function(x)
+    {
+        msg <- c("dimnames() getter for SparseArraySeed objects ",
+                 "is defunct in BioC >= 3.21")
+        .Defunct(msg=wmsg(msg))
+    }
 )
 
 setReplaceMethod("dimnames", "SparseArraySeed",
     function(x, value)
     {
-        x@dimnames <- S4Arrays:::normarg_dimnames(value, dim(x))
-        x
+        msg <- c("dimnames() setter for SparseArraySeed objects ",
+                 "is defunct in BioC >= 3.21")
+        .Defunct(msg=wmsg(msg))
     }
 )
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### sparsity()
-###
-### Now defined in the SparseArray package!
-
-#setGeneric("sparsity", function(x) standardGeneric("sparsity"))
-
-#setMethod("sparsity", "SparseArraySeed",
-#    function(x) { 1 - length(nzdata(x)) / length(x) }
-#)
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Constructor
-###
-
-.normarg_nzdata <- function(nzdata, length.out)
-{
-    if (is.null(nzdata))
-        stop(wmsg("'nzdata' cannot be NULL when 'nzindex' is not NULL"))
-    if (!is.vector(nzdata))
-        stop(wmsg("'nzdata' must be a vector"))
-    ## Same logic as S4Vectors:::V_recycle().
-    nzdata_len <- length(nzdata)
-    if (nzdata_len == length.out)
-        return(nzdata)
-    if (nzdata_len > length.out && nzdata_len != 1L)
-        stop(wmsg("'length(nzdata)' is greater than 'nrow(nzindex)'"))
-    if (nzdata_len == 0L)
-        stop(wmsg("'length(nzdata)' is 0 but 'nrow(nzindex)' is not"))
-    if (length.out %% nzdata_len != 0L)
-        warning(wmsg("'nrow(nzindex)' is not a multiple of 'length(nzdata)'"))
-    rep(nzdata, length.out=length.out)
-}
 
 SparseArraySeed <- function(dim, nzindex=NULL, nzdata=NULL, dimnames=NULL,
                             check=TRUE)
 {
-    msg <- "SparseArraySeed objects are deprecated in BioC >= 3.20"
-    .Deprecated(msg=wmsg(msg))
-    if (!is.numeric(dim))
-        stop(wmsg("'dim' must be an integer vector"))
-    if (!is.integer(dim))
-        dim <- as.integer(dim)
-    if (is.null(nzindex)) {
-        if (is.null(nzdata)) {
-            nzdata <- logical(0)  # vector()
-        } else if (!(is.vector(nzdata) && length(nzdata) == 0L)) {
-            stop(wmsg("'nzdata' must be NULL or a vector of length 0 ",
-                      "when 'nzindex' is NULL"))
-        }
-        nzindex <- matrix(integer(0), ncol=length(dim))
-    } else {
-        if (!is.matrix(nzindex))
-            stop(wmsg("'nzindex' must be a matrix"))
-        if (storage.mode(nzindex) == "double")
-            storage.mode(nzindex) <- "integer"
-        if (!is.null(dimnames(nzindex)))
-            dimnames(nzindex) <- NULL
-        nzdata <- .normarg_nzdata(nzdata, nrow(nzindex))
-    }
-    dimnames <- S4Arrays:::normarg_dimnames(dimnames, dim)
-    new2("SparseArraySeed", dim=dim, nzindex=nzindex, nzdata=nzdata,
-                            dimnames=dimnames,
-                            check=check)
+    msg <- "SparseArraySeed objects are defunct in BioC >= 3.21"
+    .Defunct(msg=wmsg(msg))
 }
 
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### dense2sparse() and sparse2dense()
-###
-
-.which_is_nonzero <- function(x, arr.ind=FALSE)
-{
-    ## Make sure to use 'type()' and not 'typeof()'.
-    zero <- vector(type(x), length=1L)
-    is_nonzero <- x != zero
-    which(is_nonzero | is.na(is_nonzero), arr.ind=arr.ind)
-}
-
-### 'x' must be an array-like object that supports 'type()' and subsetting
-### by an M-index subscript.
-### Return a SparseArraySeed object.
 dense2sparse <- function(x)
 {
-    msg <- "dense2sparse() is deprecated in BioC >= 3.20"
-    .Deprecated(msg=wmsg(msg))
-    x_dim <- dim(x)
-    if (is.null(x_dim))
-        stop(wmsg("'x' must be an array-like object"))
-    ans_nzindex <- .which_is_nonzero(x, arr.ind=TRUE)  # M-index
-    ans_nzdata <- x[ans_nzindex]
-    ## Work around bug in base::`[`
-    if (length(x_dim) == 1L)
-        ans_nzdata <- as.vector(ans_nzdata)
-    SparseArraySeed(x_dim, ans_nzindex, ans_nzdata, dimnames(x), check=FALSE)
+    msg <- "dense2sparse() is defunct in BioC >= 3.21"
+    .Defunct(msg=wmsg(msg))
 }
 
 ### 'sas' must be a SparseArraySeed object.
@@ -211,177 +84,77 @@ sparse2dense <- function(sas)
 {
     if (!is(sas, "SparseArraySeed"))
         stop(wmsg("'sas' must be a SparseArraySeed object"))
-    msg <- "SparseArraySeed objects are deprecated in BioC >= 3.20"
-    .Deprecated(msg=wmsg(msg))
-    sas_nzdata <- nzdata(sas)
-    zero <- vector(typeof(sas_nzdata), length=1L)
-    ans <- array(zero, dim=dim(sas))
-    ans[nzindex(sas)] <- sas_nzdata
-    S4Arrays:::set_dimnames(ans, dimnames(sas))
+    msg <- "SparseArraySeed objects are defunct in BioC >= 3.21"
+    .Defunct(msg=wmsg(msg))
 }
 
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### The OLD_extract_sparse_array() generic
-###
-
-### This is the workhorse behind read_sparse_block().
-### Similar to extract_array() except that:
-###   (1) The extracted array data must be returned in a SparseArraySeed
-###       object. Methods should always operate on the sparse representation
-###       of the data and never "expand" it, that is, never turn it into a
-###       dense representation for example by doing something like
-###       'dense2sparse(extract_array(x, index))'. This would defeat the
-###       purpose of read_sparse_block().
-###   (2) It should be called only on an array-like object 'x' for which
-###       'is_sparse(x)' is TRUE.
-###   (3) The subscripts in 'index' should NOT contain duplicates.
-### IMPORTANT NOTE: For the sake of efficiency, (2) and (3) are NOT checked
-### and are the responsibility of the user. We'll refer to (2) and (3) as
-### the "OLD_extract_sparse_array() Terms of Use".
 setGeneric("OLD_extract_sparse_array",
     function(x, index)
     {
-        msg <- c("OLD_extract_sparse_array() is deprecated in BioC >= 3.20. ",
+        msg <- c("OLD_extract_sparse_array() is defunct in BioC >= 3.21. ",
                  "Please use SparseArray::extract_sparse_array() instead.")
-        .Deprecated(msg=wmsg(msg))
-        x_dim <- dim(x)
-        if (is.null(x_dim))
-            stop(wmsg("first argument to OLD_extract_sparse_array() ",
-                      "must be an array-like object"))
-        ans <- standardGeneric("OLD_extract_sparse_array")
-        expected_dim <- S4Arrays:::get_Nindex_lengths(index, x_dim)
-        ## TODO: Display a more user/developper-friendly error by
-        ## doing something like the extract_array() generic where
-        ## check_returned_array() is used to display a long and
-        ## detailed error message.
-        stopifnot(is(ans, "SparseArraySeed"),
-                  identical(dim(ans), expected_dim))
-        ans
+        .Defunct(msg=wmsg(msg))
     }
 )
 
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### is_sparse(), OLD_extract_sparse_array(), and extract_array() methods for
-### SparseArraySeed objects
-###
-
-setMethod("is_sparse", "SparseArraySeed", function(x) TRUE)
-
-### IMPORTANT NOTE: The returned SparseArraySeed object is guaranteed to be
-### **correct** ONLY if the subscripts in 'index' do NOT contain duplicates!
-### If they contain duplicates, the correct SparseArraySeed object to return
-### should contain repeated nonzero data. However, in order to keep it as
-### efficient as possible, the code below does NOT repeat the nonzero data
-### that corresponds to duplicates subscripts. It does not check for
-### duplicates in 'index' either because this check could have a
-### non-negligible cost.
-### All this is OK because .OLD_extract_sparse_array_from_SparseArraySeed()
-### should always be used in a context where 'index' does NOT contain
-### duplicates. The only situation where 'index' CAN contain duplicates
-### is when .OLD_extract_sparse_array_from_SparseArraySeed() is called by
-### .extract_array_from_SparseArraySeed(), in which case the missing
-### nonzero data is added later.
-.OLD_extract_sparse_array_from_SparseArraySeed <- function(x, index)
-{
-    stopifnot(is(x, "SparseArraySeed"))
-    ans_dim <- S4Arrays:::get_Nindex_lengths(index, dim(x))
-    x_nzindex <- x@nzindex
-    for (along in seq_along(ans_dim)) {
-        i <- index[[along]]
-        if (is.null(i))
-            next
-        x_nzindex[ , along] <- match(x_nzindex[ , along], i)
+setMethod("is_sparse", "SparseArraySeed",
+    function(x)
+    {
+        msg <- c("is_sparse() method for SparseArraySeed objects ",
+                 "is defunct in BioC >= 3.21")
+        .Defunct(msg=wmsg(msg))
     }
-    keep_idx <- which(!rowAnyNAs(x_nzindex))
-    ans_nzindex <- x_nzindex[keep_idx, , drop=FALSE]
-    ans_nzdata <- x@nzdata[keep_idx]
-    SparseArraySeed(ans_dim, ans_nzindex, ans_nzdata, check=FALSE)
-}
-setMethod("OLD_extract_sparse_array", "SparseArraySeed",
-    .OLD_extract_sparse_array_from_SparseArraySeed
 )
 
-.extract_array_from_SparseArraySeed <- function(x, index)
-{
-    sas0 <- .OLD_extract_sparse_array_from_SparseArraySeed(x, index)
-    ## If the subscripts in 'index' contain duplicates, 'sas0' is
-    ## "incomplete" in the sense that it does not contain the nonzero data
-    ## that should have been repeated according to the duplicates in the
-    ## subscripts (see IMPORTANT NOTE above).
-    ans0 <- sparse2dense(sas0)
-    ## We "complete" 'ans0' by repeating the nonzero data according to the
-    ## duplicates present in the subscripts. Note that this is easy and cheap
-    ## to do now because 'ans0' uses a dense representation (it's an ordinary
-    ## array). This would be much harder to do **natively** on the
-    ## SparseArraySeed form (i.e. without converting first to dense then
-    ## back to sparse in the process).
-    sm_index <- lapply(index,
-        function(i) {
-            if (is.null(i))
-                return(NULL)
-            sm <- match(i, i)
-            if (isSequence(sm))
-                return(NULL)
-            sm
-        })
-    if (all(S4Vectors:::sapply_isNULL(sm_index)))
-        return(ans0)
-    S4Arrays:::subset_by_Nindex(ans0, sm_index)
-}
 setMethod("extract_array", "SparseArraySeed",
-    .extract_array_from_SparseArraySeed
+    function(x, index)
+    {
+        msg <- c("extract_array() method for SparseArraySeed objects ",
+                 "is defunct in BioC >= 3.21")
+        .Defunct(msg=wmsg(msg))
+    }
 )
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Coercion to/from SparseArraySeed
-###
 
 ### S3/S4 combo for as.array.SparseArraySeed
-as.array.SparseArraySeed <- function(x, ...) sparse2dense(x)
+as.array.SparseArraySeed <- function(x, ...)
+{
+    msg <- c("as.array() method for SparseArraySeed objects ",
+             "is defunct in BioC >= 3.21")
+    .Defunct(msg=wmsg(msg))
+}
 setMethod("as.array", "SparseArraySeed", as.array.SparseArraySeed)
 
 ### S3/S4 combo for as.matrix.SparseArraySeed
 .from_SparseArraySeed_to_matrix <- function(x)
 {
-    x_dim <- dim(x)
-    if (length(x_dim) != 2L)
-        stop(wmsg("'x' must have exactly 2 dimensions"))
-    sparse2dense(x)
+    msg <- c("as.matrix() method for SparseArraySeed objects ",
+             "is defunct in BioC >= 3.21")
+    .Defunct(msg=wmsg(msg))
 }
 as.matrix.SparseArraySeed <-
     function(x, ...) .from_SparseArraySeed_to_matrix(x, ...)
 setMethod("as.matrix", "SparseArraySeed", .from_SparseArraySeed_to_matrix)
 
-setAs("ANY", "SparseArraySeed", function(from) dense2sparse(from))
-
-### Going back and forth between SparseArraySeed and dg[C|R]Matrix or
-### lg[C|R]Matrix objects from the Matrix package:
+setAs("ANY", "SparseArraySeed",
+    function(from)
+    {
+        msg <- "coercion to SparseArraySeed is defunct in BioC >= 3.21"
+        .Defunct(msg=wmsg(msg))
+    }
+)
 
 .from_SparseArraySeed_to_CsparseMatrix <- function(from)
 {
-    from_dim <- dim(from)
-    if (length(from_dim) != 2L)
-        stop(wmsg("the ", class(from), " object to coerce to dgCMatrix ",
-                  "or lgCMatrix must have exactly 2 dimensions"))
-    i <- from@nzindex[ , 1L]
-    j <- from@nzindex[ , 2L]
-    SparseArray:::CsparseMatrix(from_dim, i, j, from@nzdata,
-                                dimnames=dimnames(from))
+    msg <- c("coercion from SparseArraySeed to sparseMatrix or CsparseMatrix ",
+             "is defunct in BioC >= 3.21")
+    .Defunct(msg=wmsg(msg))
 }
 
 .from_SparseArraySeed_to_RsparseMatrix <- function(from)
 {
-    from_dim <- dim(from)
-    if (length(from_dim) != 2L)
-        stop(wmsg("the ", class(from), " object to coerce to dgRMatrix ",
-                  "or lgRMatrix must have exactly 2 dimensions"))
-    i <- from@nzindex[ , 1L]
-    j <- from@nzindex[ , 2L]
-    SparseArray:::RsparseMatrix(from_dim, i, j, from@nzdata,
-                                dimnames=dimnames(from))
+    msg <- c("coercion from SparseArraySeed to RsparseMatrix ",
+             "is defunct in BioC >= 3.21")
+    .Defunct(msg=wmsg(msg))
 }
 
 setAs("SparseArraySeed", "CsparseMatrix",
@@ -402,113 +175,34 @@ setAs("SparseArraySeed", "dgRMatrix",
 setAs("SparseArraySeed", "lgCMatrix",
     function(from) as(as(from, "CsparseMatrix"), "lgCMatrix")
 )
-### Will fail if 'as(from, "RsparseMatrix")' returns a dgRMatrix object
-### because the Matrix package doesn't support coercion from dgRMatrix
-### to lgRMatrix at the moment:
-###   > as(SparseArraySeed(4:3, rbind(c(4, 3)), -2), "lgRMatrix")
-###   Error in as(as(from, "RsparseMatrix"), "lgRMatrix") :
-###     no method or default for coercing “dgRMatrix” to “lgRMatrix”
 setAs("SparseArraySeed", "lgRMatrix",
     function(from) as(as(from, "RsparseMatrix"), "lgRMatrix")
 )
 
 setAs("SparseArraySeed", "COO_SparseArray",
     function(from)
-        COO_SparseArray(dim(from), nzcoo=from@nzindex, nzdata=from@nzdata,
-                        dimnames(from), check=FALSE)
+    {
+        msg <- c("coercion from SparseArraySeed to COO_SparseArray ",
+                 "is defunct in BioC >= 3.21")
+        .Defunct(msg=wmsg(msg))
+    }
 )
 
-.make_SparseArraySeed_from_dgCMatrix_or_lgCMatrix <-
-    function(from, use.dimnames=TRUE)
-{
-    i <- from@i + 1L
-    j <- rep.int(seq_len(ncol(from)), diff(from@p))
-    ans_nzindex <- cbind(i, j, deparse.level=0L)
-    ans_dimnames <- if (use.dimnames) dimnames(from) else NULL
-    SparseArraySeed(dim(from), ans_nzindex, from@x, ans_dimnames, check=FALSE)
-}
+setAs("sparseMatrix", "SparseArraySeed",
+    function(from)
+    {
+        msg <- c("coercion from ", class(from)[[1L]], " to SparseArraySeed ",
+                 "is defunct in BioC >= 3.21")
+        .Defunct(msg=wmsg(msg))
 
-.make_SparseArraySeed_from_dgRMatrix_or_lgRMatrix <-
-    function(from, use.dimnames=TRUE)
-{
-    i <- rep.int(seq_len(nrow(from)), diff(from@p))
-    j <- from@j + 1L
-    ans_nzindex <- cbind(i, j, deparse.level=0L)
-    ans_dimnames <- if (use.dimnames) dimnames(from) else NULL
-    SparseArraySeed(dim(from), ans_nzindex, from@x, ans_dimnames, check=FALSE)
-}
-
-setAs("dgCMatrix", "SparseArraySeed",
-    function(from) .make_SparseArraySeed_from_dgCMatrix_or_lgCMatrix(from)
+    }
 )
-setAs("dgRMatrix", "SparseArraySeed",
-    function(from) .make_SparseArraySeed_from_dgRMatrix_or_lgRMatrix(from)
-)
-setAs("lgCMatrix", "SparseArraySeed",
-    function(from) .make_SparseArraySeed_from_dgCMatrix_or_lgCMatrix(from)
-)
-setAs("lgRMatrix", "SparseArraySeed",
-    function(from) .make_SparseArraySeed_from_dgRMatrix_or_lgRMatrix(from)
-)
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### is_sparse() and OLD_extract_sparse_array() methods for dg[C|R]Matrix and
-### lg[C|R]Matrix objects from the Matrix package
-###
-### TODO: Support more sparseMatrix derivatives (e.g. dgTMatrix, dgRMatrix)
-### as the need arises.
-###
-
-.OLD_extract_sparse_array_from_dgCMatrix_or_lgCMatrix <- function(x, index)
-{
-    sm <- S4Arrays:::subset_by_Nindex(x, index)  # a [d|l]gCMatrix object
-    .make_SparseArraySeed_from_dgCMatrix_or_lgCMatrix(sm, use.dimnames=FALSE)
-}
-
-.OLD_extract_sparse_array_from_dgRMatrix_or_lgRMatrix <- function(x, index)
-{
-    sm <- S4Arrays:::subset_by_Nindex(x, index)  # a [d|l]gRMatrix object
-    .make_SparseArraySeed_from_dgRMatrix_or_lgRMatrix(sm, use.dimnames=FALSE)
-}
-
-setMethod("OLD_extract_sparse_array", "dgCMatrix",
-    .OLD_extract_sparse_array_from_dgCMatrix_or_lgCMatrix
-)
-setMethod("OLD_extract_sparse_array", "dgRMatrix",
-    .OLD_extract_sparse_array_from_dgRMatrix_or_lgRMatrix
-)
-setMethod("OLD_extract_sparse_array", "lgCMatrix",
-    .OLD_extract_sparse_array_from_dgCMatrix_or_lgCMatrix
-)
-setMethod("OLD_extract_sparse_array", "lgRMatrix",
-    .OLD_extract_sparse_array_from_dgRMatrix_or_lgRMatrix
-)
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### aperm()
-###
-### Like aperm2() in S4Arrays, extend base::aperm() by allowing dropping
-### and/or adding ineffective dimensions.
-###
 
 .aperm.SparseArraySeed <- function(a, perm)
 {
-    a_dim <- dim(a)
-    perm <- S4Arrays:::normarg_perm(perm, a_dim)
-    msg <- S4Arrays:::validate_perm(perm, a_dim)
-    if (!isTRUE(msg))
-        stop(wmsg(msg))
-    new_dim <- a_dim[perm]
-    new_dim[is.na(perm)] <- 1L
-    new_nzindex <- a@nzindex[ , perm, drop=FALSE]
-    new_nzindex[ , is.na(perm)] <- 1L
-    new_dimnames <- a@dimnames[perm]
-    BiocGenerics:::replaceSlots(a, dim=new_dim,
-                                   nzindex=new_nzindex,
-                                   dimnames=new_dimnames,
-                                   check=FALSE)
+    msg <- c("aperm() method for SparseArraySeed objects ",
+             "is defunct in BioC >= 3.21")
+    .Defunct(msg=wmsg(msg))
 }
 
 ### S3/S4 combo for aperm.SparseArraySeed

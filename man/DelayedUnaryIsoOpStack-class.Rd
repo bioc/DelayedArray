@@ -11,7 +11,6 @@
 
 \alias{is_sparse,DelayedUnaryIsoOpStack-method}
 \alias{extract_sparse_array,DelayedUnaryIsoOpStack-method}
-\alias{OLD_extract_sparse_array,DelayedUnaryIsoOpStack-method}
 
 \title{DelayedUnaryIsoOpStack objects}
 

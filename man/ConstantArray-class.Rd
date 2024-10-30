@@ -8,7 +8,6 @@
 \alias{extract_array,ConstantArraySeed-method}
 \alias{is_sparse,ConstantArraySeed-method}
 \alias{extract_sparse_array,ConstantArraySeed-method}
-\alias{OLD_extract_sparse_array,ConstantArraySeed-method}
 
 \alias{class:ConstantArray}
 \alias{ConstantArray-class}

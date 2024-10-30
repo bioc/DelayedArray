@@ -174,45 +174,6 @@ setMethod("extract_sparse_array", "DelayedAbind",
     .extract_sparse_array_DelayedAbind
 )
 
-.OLD_extract_sparse_array_DelayedAbind <- function(x, index)
-{
-    i <- index[[x@along]]
-
-    if (is.null(i)) {
-        ## This is the easy situation.
-        arrays <- lapply(x@seeds, OLD_extract_sparse_array, index)
-        ## Bind the SparseArraySeed objects in 'arrays'.
-        ans <- abind_SparseArraySeed_objects(arrays, x@along)
-        return(ans)
-    }
-
-    ## From now on 'i' is a vector of positive integers.
-    dims <- S4Arrays:::get_dims_to_bind(x@seeds, x@along)
-    breakpoints <- cumsum(dims[x@along, ])
-    part_idx <- S4Arrays:::get_part_index(i, breakpoints)
-    split_part_idx <- S4Arrays:::split_part_index(part_idx, length(breakpoints))
-    FUN <- function(s) {
-        index[[x@along]] <- split_part_idx[[s]]
-        OLD_extract_sparse_array(x@seeds[[s]], index)
-    }
-    arrays <- lapply(seq_along(x@seeds), FUN)
-
-    ## Bind the SparseArraySeed objects in 'arrays'.
-    ans <- abind_SparseArraySeed_objects(arrays, x@along)
-
-    ## Reorder the rows or columns in 'ans'.
-    Nindex <- vector("list", length=length(index))
-    Nindex[[x@along]] <- S4Arrays:::get_rev_index(part_idx)
-    OLD_extract_sparse_array(ans, Nindex)
-}
-
-### 'is_sparse(x)' is assumed to be TRUE and 'index' is assumed to
-### not contain duplicates. See "OLD_extract_sparse_array() Terms of Use"
-### in SparseArraySeed-class.R
-setMethod("OLD_extract_sparse_array", "DelayedAbind",
-    .OLD_extract_sparse_array_DelayedAbind
-)
-
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Backward compatibility with DelayedArray < 0.5.24

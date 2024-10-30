@@ -14,7 +14,6 @@
 
 \alias{is_sparse,DelayedAperm-method}
 \alias{extract_sparse_array,DelayedAperm-method}
-\alias{OLD_extract_sparse_array,DelayedAperm-method}
 
 \alias{updateObject,SeedDimPicker-method}
 
