@@ -74,6 +74,11 @@
 \alias{scale.DelayedMatrix}
 \alias{scale,DelayedMatrix-method}
 
+\alias{paste2}
+\alias{paste2,DelayedArray,vector-method}
+\alias{paste2,vector,DelayedArray-method}
+\alias{paste2,DelayedArray,DelayedArray-method}
+
 \title{Common operations on DelayedArray objects}
 
 \description{
@@ -98,6 +103,9 @@
     \item \code{\link[base]{sweep}}
     \item \code{\link[base]{scale}} (when the supplied \code{center} and
           \code{scale} are not TRUE)
+    \item \code{\link[BiocGenerics]{paste2}},
+          \code{\link[BiocGenerics]{add_prefix}},
+          \code{\link[BiocGenerics]{add_suffix}}
     \item statistical functions like \code{dnorm}, \code{dbinom}, \code{dpois},
           and \code{dlogis} (for the Normal, Binomial, Poisson, and Logistic
           distribution, respectively) and related functions (documented in
@@ -151,6 +159,8 @@
 
     \item \code{\link[base]{sweep}} and \code{\link[base]{scale}} in the
           \pkg{base} package.
+
+    \item \code{\link[BiocGenerics]{paste2}} in the \pkg{BiocGenerics} package.
   }
 }
 
@@ -252,5 +262,9 @@ cmeans <- colMeans(M2)             # block-processed
 sweep(M2, 2, cmeans)               # delayed
 scale(M2)                          # delayed & block-processed
 scale(M2, center=FALSE, scale=10)  # delayed
+
+paste2(A3, letters[1:5])           # delayed
+A6 <- add_prefix("ID", A3)         # delayed
+add_suffix(A6, ".fasta")           # delayed
 }
 \keyword{methods}

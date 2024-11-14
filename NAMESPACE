@@ -197,13 +197,14 @@ exportMethods(
     aperm,
     dims,
     grepl,
+    paste2,
     path, "path<-",
     table,
     type, "type<-",
     updateObject,
-    rowSums, colSums, rowMeans, colMeans,
 
     ## Methods for generics defined in the MatrixGenerics package:
+    rowSums, colSums, rowMeans, colMeans,
     rowMins, colMins,
     rowMaxs, colMaxs,
     rowRanges, colRanges,

@@ -223,7 +223,8 @@ setMethod("-", c("DelayedArray", "missing"),
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### pmax2() and pmin2()
 ###
-### We treat them like the binary operators of the "Ops" group generics.
+### TODO: Maybe move the pmax2() and pmin2() generics and their default
+### methods to the BiocGenerics package, like we did for paste2().
 ###
 
 setGeneric("pmax2", function(e1, e2) standardGeneric("pmax2"))
@@ -289,6 +290,8 @@ setMethod("pmin2", c("ANY", "ANY"),
     }
 )
 
+### We define the delayed pmax2() and pmin2() methods like the delayed "Ops"
+### methods.
 for (.Generic in c("pmax2", "pmin2")) {
     setMethod(.Generic, c("DelayedArray", "vector"),
         function(e1, e2)
@@ -888,4 +891,23 @@ scale.DelayedMatrix <- function(x, center=TRUE, scale=TRUE)
     ans
 }
 setMethod("scale", "DelayedMatrix", scale.DelayedMatrix)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### paste2()
+###
+
+### We define the delayed paste2() methods like the delayed "Ops" methods.
+setMethod("paste2", c("DelayedArray", "vector"),
+    function(x, y)
+        .DelayedArray_Ops_with_right_vector("paste2", x, y)
+)
+setMethod("paste2", c("vector", "DelayedArray"),
+    function(x, y)
+        .DelayedArray_Ops_with_left_vector("paste2", x, y)
+)
+setMethod("paste2", c("DelayedArray", "DelayedArray"),
+    function(x, y)
+        .DelayedArray_Ops("paste2", x, y)
+)
 
