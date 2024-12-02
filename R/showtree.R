@@ -160,7 +160,7 @@ modify_seeds <- function(x, FUN, ...)
 ### and setter MUST work on 'x'.
 ###
 
-IS_NOT_SUPOORTED_IF_MULTIPLE_SEEDS <- c(
+IS_NOT_SUPPORTED_IF_MULTIPLE_SEEDS <- c(
     "is not supported on a DelayedArray object with multiple seeds at the ",
     "moment. Note that you can check the number of seeds with nseed()."
 )
@@ -172,7 +172,7 @@ setMethod("seed", "DelayedOp",
     {
         if (is(x, "DelayedNaryOp")) {
             ## Tree is not linear.
-            stop(wmsg("seed() ", IS_NOT_SUPOORTED_IF_MULTIPLE_SEEDS,
+            stop(wmsg("seed() ", IS_NOT_SUPPORTED_IF_MULTIPLE_SEEDS,
                       " You can use 'seedApply(x, identity)' to extract ",
                       "all the seeds as a list."))
         }
@@ -207,7 +207,7 @@ setReplaceMethod("seed", "DelayedOp",
     {
         if (is(x, "DelayedNaryOp")) {
             ## Tree is not linear.
-            stop(wmsg("the seed() setter ", IS_NOT_SUPOORTED_IF_MULTIPLE_SEEDS))
+            stop(wmsg("the seed() setter ", IS_NOT_SUPPORTED_IF_MULTIPLE_SEEDS))
         }
         x1 <- x@seed
         if (!is(x1, "DelayedOp")) {
@@ -226,40 +226,39 @@ setReplaceMethod("seed", "DelayedOp",
 ### path() getter/setter
 ###
 
-### The path of a DelayedOp object is the path of its leaf seed. So path()
-### will work on a DelayedOp object only if it works on its leaf seed.
-### For example it will work if its leaf seed is an on-disk object (e.g. an
-### HDF5ArraySeed object) but not if it's an in-memory object (e.g. an
-### ordinary array or RleArraySeed object).
+### The path of a DelayedOp object is the path of its **immediate** seed
+### (recursive definition). Raises an error if:
+### - the DelayedOp object has more than one **immediate** seed, that is,
+###   if the object is a DelayedNaryOp object;
+### - or calling path() on the **leaf** seed (innermost call to path())
+###   fails, typically because no path() method is defined for the **leaf**
+###   seed.
+### For example, path() will work on an HDF5Array object but not on an
+### RleArray object (will raise an error).
 setMethod("path", "DelayedOp",
     function(object, ...)
     {
-        object_seed <- try(seed(object), silent=TRUE)
-        if (is(object_seed, "try-error")) {
+        if (is(object, "DelayedNaryOp")) {
             ## Tree is not linear.
-            stop(wmsg("path() ", IS_NOT_SUPOORTED_IF_MULTIPLE_SEEDS,
-                      " You can use 'seedApply(x, path)' to extract ",
+            stop(wmsg("path() ", IS_NOT_SUPPORTED_IF_MULTIPLE_SEEDS,
+                      " You can use 'seedApply(object, path)' to extract ",
                       "all the seed paths as a list."))
         }
-        path(object_seed, ...)
+        object <- object@seed
+        callGeneric()
     }
 )
 
-### The path() setter will work on a DelayedOp object only if it works on
-### its leaf seed. For example it will work if its leaf seed is an on-disk
-### object (e.g. an HDF5ArraySeed object) but not if it's an in-memory object
-### (e.g. an ordinary array or RleArraySeed object).
 setReplaceMethod("path", "DelayedOp",
     function(object, ..., value)
     {
-        object_seed <- try(seed(object), silent=TRUE)
-        if (is(object_seed, "try-error")) {
+        if (is(object, "DelayedNaryOp")) {
             ## Tree is not linear.
-            stop(wmsg("path() ", IS_NOT_SUPOORTED_IF_MULTIPLE_SEEDS))
+            stop(wmsg("the path() setter ",
+                      IS_NOT_SUPPORTED_IF_MULTIPLE_SEEDS))
         }
-        path(object_seed, ...) <- value
-        seed(object) <- object_seed
-        object
+        object <- object@seed
+        callGeneric()
     }
 )
 

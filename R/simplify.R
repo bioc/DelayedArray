@@ -333,7 +333,7 @@ contentIsPristine <- function(x)
     if (is(x, "DelayedNaryOp")) {
         ## Tree is not linear.
         stop(wmsg("netSubsetAndAperm() ",
-                  IS_NOT_SUPOORTED_IF_MULTIPLE_SEEDS))
+                  IS_NOT_SUPPORTED_IF_MULTIPLE_SEEDS))
     }
     x1 <- .remove_unary_iso_ops(x@seed)
     if (is(x, "DelayedUnaryIsoOp")) {
