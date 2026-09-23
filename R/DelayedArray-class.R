@@ -205,6 +205,10 @@ setMethod("DelayedArray", "DelayedOp",
     }
 )
 
+### Coercion from array/matrix to DelayedArray/DelayedMatrix.
+setAs("array", "DelayedArray", function(from) new_DelayedArray(from))
+setAs("matrix", "DelayedMatrix", function(from) new_DelayedArray(from))
+
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### simplify()

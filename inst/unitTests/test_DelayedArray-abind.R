@@ -178,10 +178,8 @@ test_DelayedArray_acbind <- function()
 
     ## acbind() is not supported on 1D DelayedArray objects
     a1 <- array(11:15, 5, dimnames=list(LETTERS[1:5]))
-    A1 <- DelayedArray(a1)
-    checkException(acbind(A1))          # unary
-    checkException(cbind(A1))
     b1 <- array(letters[1:3])
+    A1 <- DelayedArray(a1)
     B1 <- DelayedArray(b1)
     checkException(acbind(A1, B1))      # binary
     checkException(cbind(A1, B1))

@@ -175,7 +175,6 @@ exportMethods(
 
     ## Methods for generics defined in the BiocGenerics package:
     aperm,
-    cbind, rbind,
     dims,
     grepl,
     group,
@@ -194,7 +193,6 @@ exportMethods(
     rowVars, colVars,
 
     ## Methods for generics defined in the S4Vectors package:
-    bindROWS,
     showAsCell, isEmpty,
     splitAsList,
 
@@ -202,7 +200,7 @@ exportMethods(
     ranges, start, end, width,
 
     ## Methods for generics defined in the S4Arrays package:
-    rowsum, arbind, acbind, extract_array, is_sparse, write_block,
+    rowsum, abind, extract_array, is_sparse, write_block,
 
     ## Methods for generics defined in the SparseArray package:
     nzwhich, nzdata, extract_sparse_array
